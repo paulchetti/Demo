@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { X, Lock, User, AlertCircle, Loader2, KeyRound } from 'lucide-react';
+import { X, Lock, User, AlertCircle, Loader2 } from 'lucide-react';
 
 export function LoginModal({ isOpen, onClose, onOpenKyc }) {
   const { login } = useAuth();
@@ -24,11 +24,6 @@ export function LoginModal({ isOpen, onClose, onOpenKyc }) {
     } finally {
       setLoading(false);
     }
-  }
-
-  function fillAdminCredentials() {
-    setIdentifier('admin');
-    setPassword('admin123');
   }
 
   return (
@@ -136,40 +131,6 @@ export function LoginModal({ isOpen, onClose, onOpenKyc }) {
             )}
           </button>
         </form>
-
-        {/* Quick Admin fill for developer / testing */}
-        <div style={{
-          background: 'rgba(255, 255, 255, 0.03)',
-          border: '1px dashed rgba(255, 255, 255, 0.1)',
-          borderRadius: '10px',
-          padding: '10px 14px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          marginBottom: '16px',
-          fontSize: '12px'
-        }}>
-          <span style={{ color: '#9ca3af' }}>Administrator Quick Login:</span>
-          <button
-            type="button"
-            onClick={fillAdminCredentials}
-            style={{
-              background: 'rgba(255, 183, 3, 0.15)',
-              color: '#ffb703',
-              border: '1px solid rgba(255, 183, 3, 0.3)',
-              borderRadius: '6px',
-              padding: '4px 8px',
-              fontSize: '11px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px'
-            }}
-          >
-            <KeyRound size={12} /> Fill Admin Login
-          </button>
-        </div>
 
         <div style={{ textAlign: 'center', fontSize: '13px', color: '#9ca3af' }}>
           Don't have credentials yet?{' '}
