@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { API_BASE } from '../apiConfig.js';
 import {
   Wallet,
   ArrowDownToLine,
@@ -43,7 +44,7 @@ export function UserDashboard() {
       const token = localStorage.getItem('tt_token');
       if (impersonatedUser) {
         // Fetch specific impersonated user transactions
-        const res = await fetch(`/api/admin/users/${impersonatedUser.id}/dashboard`, {
+        const res = await fetch(`${API_BASE}/api/admin/users/${impersonatedUser.id}/dashboard`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         const data = await res.json();
@@ -51,7 +52,7 @@ export function UserDashboard() {
           setMyTransactions(data.transactions || []);
         }
       } else {
-        const res = await fetch('/api/transactions/my', {
+        const res = await fetch(`${API_BASE}/api/transactions/my`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         const data = await res.json();

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { X, ArrowUpFromLine, AlertTriangle, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { API_BASE } from '../apiConfig.js';
 
 export function WithdrawModal({ isOpen, onClose }) {
   const { wallet, user, refreshProfile } = useAuth();
@@ -47,7 +48,7 @@ export function WithdrawModal({ isOpen, onClose }) {
 
     try {
       const token = localStorage.getItem('tt_token');
-      const res = await fetch('/api/transactions/withdraw', {
+      const res = await fetch(`${API_BASE}/api/transactions/withdraw`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

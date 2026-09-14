@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { API_BASE } from '../apiConfig.js';
 import {
   Users,
   UserPlus,
@@ -69,10 +70,10 @@ export function AdminDashboard() {
 
     try {
       const [usersRes, txsRes, kycRes, settingsRes] = await Promise.all([
-        fetch('/api/admin/users', { headers }),
-        fetch('/api/admin/transactions', { headers }),
-        fetch('/api/admin/kyc-submissions', { headers }),
-        fetch('/api/admin/settings', { headers })
+        fetch(`${API_BASE}/api/admin/users`, { headers }),
+        fetch(`${API_BASE}/api/admin/transactions`, { headers }),
+        fetch(`${API_BASE}/api/admin/kyc-submissions`, { headers }),
+        fetch(`${API_BASE}/api/admin/settings`, { headers })
       ]);
 
       const [usersData, txsData, kycData, settingsData] = await Promise.all([
@@ -98,7 +99,7 @@ export function AdminDashboard() {
     const token = localStorage.getItem('tt_token');
 
     try {
-      const res = await fetch('/api/admin/users', {
+      const res = await fetch(`${API_BASE}/api/admin/users`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -158,7 +159,7 @@ export function AdminDashboard() {
     const token = localStorage.getItem('tt_token');
 
     try {
-      const res = await fetch(`/api/admin/users/${selectedUser.id}`, {
+      const res = await fetch(`${API_BASE}/api/admin/users/${selectedUser.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -183,7 +184,7 @@ export function AdminDashboard() {
     const token = localStorage.getItem('tt_token');
 
     try {
-      const res = await fetch(`/api/admin/users/${user.id}`, {
+      const res = await fetch(`${API_BASE}/api/admin/users/${user.id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -198,7 +199,7 @@ export function AdminDashboard() {
   async function handleTransactionAction(txId, status) {
     const token = localStorage.getItem('tt_token');
     try {
-      const res = await fetch(`/api/admin/transactions/${txId}/status`, {
+      const res = await fetch(`${API_BASE}/api/admin/transactions/${txId}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -218,7 +219,7 @@ export function AdminDashboard() {
     e.preventDefault();
     const token = localStorage.getItem('tt_token');
     try {
-      const res = await fetch('/api/admin/settings', {
+      const res = await fetch(`${API_BASE}/api/admin/settings`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -529,7 +530,7 @@ export function AdminDashboard() {
                         {sub.files.map((f, i) => (
                           <a
                             key={i}
-                            href={`/uploads/${f.filename}`}
+                            href={`${API_BASE}/uploads/${f.filename}`}
                             target="_blank"
                             rel="noreferrer"
                             style={{

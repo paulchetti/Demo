@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, ArrowDownToLine, Copy, Check, AlertTriangle, ShieldCheck, QrCode } from 'lucide-react';
+import { API_BASE } from '../apiConfig.js';
 
 export function DepositModal({ isOpen, onClose }) {
   const [depositInfo, setDepositInfo] = useState({
@@ -15,7 +16,7 @@ export function DepositModal({ isOpen, onClose }) {
 
   useEffect(() => {
     if (isOpen) {
-      fetch('/api/deposit-info')
+      fetch(`${API_BASE}/api/deposit-info`)
         .then(res => res.json())
         .then(data => {
           if (data.success && data.depositInfo) {
@@ -42,7 +43,7 @@ export function DepositModal({ isOpen, onClose }) {
 
     try {
       const token = localStorage.getItem('tt_token');
-      const res = await fetch('/api/transactions/deposit', {
+      const res = await fetch(`${API_BASE}/api/transactions/deposit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

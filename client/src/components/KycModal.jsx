@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, ShieldCheck, Upload, FileText, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { API_BASE } from '../apiConfig.js';
 
 export function KycModal({ isOpen, onClose }) {
   const [formData, setFormData] = useState({
@@ -65,7 +66,7 @@ export function KycModal({ isOpen, onClose }) {
       data.append('aadharBackFile', aadharBackFile);
       data.append('panFile', panFile);
 
-      const res = await fetch('/api/kyc/submit', {
+      const res = await fetch(`${API_BASE}/api/kyc/submit`, {
         method: 'POST',
         body: data
       });

@@ -71,5 +71,46 @@ The application will be accessible at `http://localhost:5173`.
 
 ---
 
+## 🚀 Free Deployment Guide (No Custom Domain Required)
+
+You can deploy the platform 100% free with automated SSL domains:
+- **Backend API**: Hosted on **Render** (provides free `https://<your-app>.onrender.com`)
+- **Frontend App**: Hosted on **Vercel** (provides free `https://<your-app>.vercel.app`)
+
+### Step 1: Deploy Backend to Render (render.com)
+1. Sign up/Log in at [render.com](https://render.com) using your GitHub account.
+2. Click **New +** -> **Web Service**.
+3. Select and connect your repository: `paulchetti/Trading-Trends`.
+4. Configure settings:
+   - **Name**: `trading-trends-api` (or your choice)
+   - **Root Directory**: `server`
+   - **Runtime**: `Node`
+   - **Build Command**: `npm install`
+   - **Start Command**: `node index.js`
+   - **Instance Type**: `Free`
+5. In **Environment Variables**, add:
+   - `ADMIN_EMAIL` = `chettipaul@gmail.com`
+   - `JWT_SECRET` = `trading_trends_secure_secret_2026` (or any random string)
+   - `NODE_ENV` = `production`
+6. Click **Deploy Web Service**.
+7. Once deployed, copy your backend URL (e.g., `https://trading-trends-api.onrender.com`).
+
+### Step 2: Deploy Frontend to Vercel (vercel.com)
+1. Sign up/Log in at [vercel.com](https://vercel.com) using your GitHub account.
+2. Click **Add New...** -> **Project**.
+3. Import your `Trading-Trends` repository.
+4. In project configuration:
+   - **Framework Preset**: `Vite`
+   - **Root Directory**: click `Edit` and select `client` (or leave default if using root `vercel.json`)
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `dist`
+5. Expand **Environment Variables** and add:
+   - **Key**: `VITE_API_URL`
+   - **Value**: Your Render backend URL from Step 1 (e.g., `https://trading-trends-api.onrender.com`)
+6. Click **Deploy**.
+7. Vercel will instantly generate your live website URL (e.g., `https://trading-trends.vercel.app`) with free SSL.
+
+---
+
 ## License
 Proprietary & Confidential - Trading Trends Institutional Technologies.
