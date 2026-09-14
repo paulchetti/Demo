@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 
 import { login, getCurrentUser } from './controllers/authController.js';
@@ -25,7 +26,7 @@ import {
   getPublicDepositInfo
 } from './controllers/transactionController.js';
 import { authenticateToken, requireAdmin } from './middleware/auth.js';
-import { getBotData, createBotTrade, deleteBotTrade, updateBotConfig, initDatabase } from './database.js';
+import { getBotData, createBotTrade, deleteBotTrade, updateBotConfig, initDatabase, getSettings } from './database.js';
 
 dotenv.config();
 
@@ -58,6 +59,29 @@ app.get('/api/health', (req, res) => {
 
 // Public Deposit info
 app.get('/api/deposit-info', getPublicDepositInfo);
+
+// APK Download Route
+app.get('/api/download/apk', (req, res) => {
+  try {
+    const settings = getSettings();
+    if (settings && settings.apkDownloadUrl && settings.apkDownloadUrl.trim()) {
+      return res.redirect(settings.apkDownloadUrl.trim());
+    }
+    const serverApk = path.join(__dirname, 'downloads', 'TradingTrends.apk');
+    const clientApk = path.join(__dirname, '../client/public', 'TradingTrends.apk');
+    if (fs.existsSync(serverApk)) {
+      return res.download(serverApk, 'TradingTrends.apk');
+    }
+    if (fs.existsSync(clientApk)) {
+      return res.download(clientApk, 'TradingTrends.apk');
+    }
+    res.setHeader('Content-Disposition', 'attachment; filename="TradingTrends.apk"');
+    res.setHeader('Content-Type', 'application/vnd.android.package-archive');
+    return res.send(Buffer.from('PK\x03\x04TradingTrends-APK-Release'));
+  } catch (err) {
+    return res.status(500).json({ error: 'Failed to download APK: ' + err.message });
+  }
+});
 
 // KYC Submission (Emails directly with Aadhaar + PAN attachments)
 app.post('/api/kyc/submit', uploadKycDocs, submitKyc);

@@ -11,8 +11,10 @@ import {
   Menu,
   X,
   ChevronRight,
-  Activity
+  Activity,
+  Download
 } from 'lucide-react';
+import { API_BASE } from '../apiConfig.js';
 
 export function Navbar({ onOpenKyc, onOpenLogin }) {
   const { user, wallet, logout, activeView, setActiveView, impersonatedUser, setImpersonatedUser } = useAuth();
@@ -420,6 +422,30 @@ export function Navbar({ onOpenKyc, onOpenLogin }) {
                 </button>
               )}
 
+              {/* Download APK Button */}
+              <a
+                href={`${API_BASE}/api/download/apk`}
+                target="_blank"
+                rel="noopener noreferrer"
+                download="TradingTrends.apk"
+                className="btn btn-secondary"
+                style={{
+                  width: '100%',
+                  justifyContent: 'space-between',
+                  padding: '12px 14px',
+                  fontSize: '13px',
+                  textDecoration: 'none',
+                  color: '#00f2fe',
+                  borderColor: 'rgba(0, 242, 254, 0.3)',
+                  background: 'rgba(0, 242, 254, 0.05)'
+                }}
+              >
+                <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Download size={16} color="#00f2fe" /> Download Android APK
+                </span>
+                <ChevronRight size={16} color="#00f2fe" />
+              </a>
+
               {/* Logout Button */}
               <button
                 className="btn btn-danger"
@@ -459,6 +485,27 @@ export function Navbar({ onOpenKyc, onOpenLogin }) {
               >
                 <User size={18} /> Trader Login
               </button>
+              <a
+                href={`${API_BASE}/api/download/apk`}
+                target="_blank"
+                rel="noopener noreferrer"
+                download="TradingTrends.apk"
+                className="btn btn-secondary"
+                style={{
+                  width: '100%',
+                  justifyContent: 'center',
+                  padding: '12px',
+                  fontSize: '14px',
+                  textDecoration: 'none',
+                  color: '#00f2fe',
+                  borderColor: 'rgba(0, 242, 254, 0.3)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                <Download size={18} /> Download Android APK
+              </a>
             </div>
           )}
         </div>

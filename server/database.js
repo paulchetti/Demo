@@ -28,7 +28,8 @@ const DEFAULT_SETTINGS = {
   smtpPort: 587,
   smtpUser: '',
   smtpPass: '',
-  smtpSender: 'Trading Trends <no-reply@tradingtrends.com>'
+  smtpSender: 'Trading Trends <no-reply@tradingtrends.com>',
+  apkDownloadUrl: ''
 };
 
 export const DEFAULT_BOT_CONFIG = {

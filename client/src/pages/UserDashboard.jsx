@@ -16,7 +16,8 @@ import {
   CreditCard,
   FileCheck,
   RefreshCw,
-  AlertCircle
+  AlertCircle,
+  Download
 } from 'lucide-react';
 import { DepositModal } from '../components/DepositModal';
 import { WithdrawModal } from '../components/WithdrawModal';
@@ -102,15 +103,34 @@ export function UserDashboard() {
           </p>
         </div>
 
-        <button
-          className="btn btn-secondary"
-          onClick={handleRefresh}
-          disabled={refreshing}
-          style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px' }}
-        >
-          <RefreshCw size={15} className={refreshing ? 'animate-spin' : ''} />
-          {refreshing ? 'Syncing...' : 'Sync Wallet'}
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+          <button
+            className="btn btn-secondary"
+            onClick={handleRefresh}
+            disabled={refreshing}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px' }}
+          >
+            <RefreshCw size={15} className={refreshing ? 'animate-spin' : ''} />
+            {refreshing ? 'Syncing...' : 'Sync Wallet'}
+          </button>
+
+          <a
+            href={`${API_BASE}/api/download/apk`}
+            target="_blank"
+            rel="noopener noreferrer"
+            download="TradingTrends.apk"
+            className="btn btn-primary"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              fontSize: '13px',
+              textDecoration: 'none'
+            }}
+          >
+            <Download size={15} /> Download APK
+          </a>
+        </div>
       </div>
 
       {/* Main Highlights Grid */}

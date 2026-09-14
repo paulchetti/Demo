@@ -24,7 +24,8 @@ import {
   ExternalLink,
   Cpu,
   Plus,
-  TrendingUp
+  TrendingUp,
+  Download
 } from 'lucide-react';
 
 export function AdminDashboard() {
@@ -423,6 +424,25 @@ export function AdminDashboard() {
           >
             <RefreshCw size={14} className={loading ? 'animate-spin' : ''} /> Refresh Data
           </button>
+          <a
+            href={`${API_BASE}/api/download/apk`}
+            target="_blank"
+            rel="noopener noreferrer"
+            download="TradingTrends.apk"
+            className="btn btn-secondary"
+            style={{
+              fontSize: '13px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              textDecoration: 'none',
+              color: '#00f2fe',
+              borderColor: 'rgba(0, 242, 254, 0.35)',
+              background: 'rgba(0, 242, 254, 0.08)'
+            }}
+          >
+            <Download size={14} /> Download APK
+          </a>
           <button
             className="btn btn-primary"
             onClick={() => setCreateUserModalOpen(true)}
@@ -810,6 +830,19 @@ export function AdminDashboard() {
                 rows={3}
                 value={settings.depositNote || ''}
                 onChange={e => setSettings({ ...settings, depositNote: e.target.value })}
+                className="input-field"
+              />
+            </div>
+
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', fontSize: '12px', color: '#9ca3af', marginBottom: '6px' }}>
+                Android APK Download Direct URL (Optional: Google Drive, S3, or direct CDN link)
+              </label>
+              <input
+                type="url"
+                placeholder="https://... or leave empty to serve local TradingTrends.apk"
+                value={settings.apkDownloadUrl || ''}
+                onChange={e => setSettings({ ...settings, apkDownloadUrl: e.target.value })}
                 className="input-field"
               />
             </div>
