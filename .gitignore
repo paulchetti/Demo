@@ -16,9 +16,8 @@ server/.env
 server/uploads/*
 !server/uploads/.gitkeep
 
-# Persistent storage / data files
-server/data/*.json
-!server/data/.gitkeep
+# Persistent storage / data files (tracked so initial and demo users deploy to Render)
+# server/data/*.json
 
 # Logs & OS artifacts
 *.log
