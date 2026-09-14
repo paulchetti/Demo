@@ -215,7 +215,7 @@
     "depositNetwork": "USDT (TRC-20)",
     "depositQrCode": "",
     "depositNote": "Please deposit only USDT TRC-20 to this address. Sending any other currency or using another network may result in permanent loss. Contact support after transfer.",
-    "adminEmail": "chettipaul@gmail.com",
+    "adminEmail": "tradingtrendsbeta@gmail.com",
     "smtpHost": "",
     "smtpPort": 587,
     "smtpUser": "",

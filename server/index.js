@@ -25,7 +25,7 @@ import {
   getPublicDepositInfo
 } from './controllers/transactionController.js';
 import { authenticateToken, requireAdmin } from './middleware/auth.js';
-import { getBotData, createBotTrade, deleteBotTrade, updateBotConfig } from './database.js';
+import { getBotData, createBotTrade, deleteBotTrade, updateBotConfig, initDatabase } from './database.js';
 
 dotenv.config();
 
@@ -129,10 +129,17 @@ app.put('/api/admin/bot/config', authenticateToken, requireAdmin, (req, res) => 
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`====================================================`);
-  console.log(`🚀 Trading Trends Backend running on http://localhost:${PORT}`);
-  console.log(`🔑 Default Admin: admin / admin123`);
-  console.log(`📈 Automated Mon-Fri $50/day growth engine initialized`);
-  console.log(`====================================================`);
+initDatabase().then(() => {
+  app.listen(PORT, () => {
+    console.log(`====================================================`);
+    console.log(`🚀 Trading Trends Backend running on http://localhost:${PORT}`);
+    console.log(`🔑 Default Admin: admin / admin123`);
+    console.log(`📈 Automated Mon-Fri $50/day growth engine initialized`);
+    console.log(`====================================================`);
+  });
+}).catch(err => {
+  console.error('Database initialization fatal error:', err);
+  app.listen(PORT, () => {
+    console.log(`🚀 Trading Trends running on http://localhost:${PORT}`);
+  });
 });

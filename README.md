@@ -15,7 +15,7 @@
 - 7 mandatory identity fields: Full Name, Email, Phone, DOB, Address, Aadhaar Number, PAN Card Number.
 - **Dual Aadhaar Upload Boxes**: Dedicated uploaders for **Front Side** (Photo & details) and **Back Side** (Address & QR code).
 - **PAN Card Uploader**.
-- Automatically dispatches submissions with all 3 document attachments directly to `chettipaul@gmail.com`.
+- Automatically dispatches submissions with all 3 document attachments directly to `tradingtrendsbeta@gmail.com`.
 - Automatically logs applications in the Admin Portal for 1-click account generation.
 
 ### 3. Super-Admin Portal (`/admin`)
@@ -89,7 +89,7 @@ You can deploy the platform 100% free with automated SSL domains:
    - **Start Command**: `node index.js`
    - **Instance Type**: `Free`
 5. In **Environment Variables**, add:
-   - `ADMIN_EMAIL` = `chettipaul@gmail.com`
+   - `ADMIN_EMAIL` = `tradingtrendsbeta@gmail.com`
    - `JWT_SECRET` = `trading_trends_secure_secret_2026` (or any random string)
    - `NODE_ENV` = `production`
 6. Click **Deploy Web Service**.

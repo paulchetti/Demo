@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import bcrypt from 'bcryptjs';
 import { fileURLToPath } from 'url';
+import { MongoClient } from 'mongodb';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -12,12 +13,17 @@ if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
 }
 
+// In-Memory store cache for instant lookups
+let memoryStore = null;
+let mongoClient = null;
+let mongoCollection = null;
+
 const DEFAULT_SETTINGS = {
   depositUsdtAddress: 'TXyZ889KqN7W8B29LkJ5Q81HkMvPqS4eRt',
   depositNetwork: 'USDT (TRC-20)',
   depositQrCode: '',
   depositNote: 'Please deposit only USDT TRC-20 to this address. Sending any other currency or using another network may result in permanent loss. Contact support after transfer.',
-  adminEmail: 'chettipaul@gmail.com',
+  adminEmail: 'tradingtrendsbeta@gmail.com',
   smtpHost: '',
   smtpPort: 587,
   smtpUser: '',
@@ -40,7 +46,53 @@ export const DEFAULT_BOT_TRADES = [
   { id: 'trade-4', pair: 'BTC/USDT', type: 'SHORT', entry: '65,120.00', exit: '64,950.00', profit: '+$12.50', time: '2 hours ago', status: 'CLOSED' }
 ];
 
-function readDb() {
+export async function initDatabase() {
+  const localDb = readLocalDb();
+  memoryStore = localDb;
+
+  const mongoUri = process.env.MONGODB_URI;
+  if (!mongoUri) {
+    console.log('ℹ️ Running in local JSON file database mode. (Set MONGODB_URI in Render to enable permanent MongoDB Atlas cloud persistence)');
+    return;
+  }
+
+  try {
+    console.log('🔄 Connecting to MongoDB Atlas...');
+    mongoClient = new MongoClient(mongoUri, {
+      serverSelectionTimeoutMS: 10000
+    });
+    await mongoClient.connect();
+    const db = mongoClient.db('TradingTrends');
+    mongoCollection = db.collection('app_store');
+    console.log('✅ Connected to MongoDB Atlas successfully!');
+
+    const cloudData = await mongoCollection.findOne({ _id: 'main_store' });
+    if (cloudData) {
+      memoryStore = {
+        users: cloudData.users || [],
+        transactions: cloudData.transactions || [],
+        kycSubmissions: cloudData.kycSubmissions || [],
+        settings: { ...DEFAULT_SETTINGS, ...cloudData.settings },
+        botConfig: { ...DEFAULT_BOT_CONFIG, ...cloudData.botConfig },
+        botTrades: cloudData.botTrades || [...DEFAULT_BOT_TRADES]
+      };
+      writeLocalDb(memoryStore);
+      console.log(`✅ MongoDB Sync: Loaded ${memoryStore.users.length} users, ${memoryStore.transactions.length} transactions, and ${memoryStore.botTrades.length} bot trades from cloud.`);
+    } else {
+      // First time connecting to MongoDB: seed cloud from local store.json
+      await mongoCollection.updateOne(
+        { _id: 'main_store' },
+        { $set: memoryStore },
+        { upsert: true }
+      );
+      console.log(`✅ Seeded MongoDB Atlas with initial data (${memoryStore.users.length} users) from store.json!`);
+    }
+  } catch (err) {
+    console.error('⚠️ MongoDB connection error (using local store.json fallback):', err.message);
+  }
+}
+
+function readLocalDb() {
   try {
     if (!fs.existsSync(DB_FILE)) {
       const initialDb = {
@@ -51,7 +103,6 @@ function readDb() {
         botConfig: { ...DEFAULT_BOT_CONFIG },
         botTrades: [...DEFAULT_BOT_TRADES]
       };
-      // Create initial default admin
       const salt = bcrypt.genSaltSync(10);
       const adminPasswordHash = bcrypt.hashSync('admin123', salt);
       initialDb.users.push({
@@ -94,13 +145,32 @@ function readDb() {
   }
 }
 
-function writeDb(data) {
+function writeLocalDb(data) {
   try {
     const tmpFile = `${DB_FILE}.tmp`;
     fs.writeFileSync(tmpFile, JSON.stringify(data, null, 2), 'utf-8');
     fs.renameSync(tmpFile, DB_FILE);
   } catch (err) {
     console.error('Error writing database file:', err);
+  }
+}
+
+function readDb() {
+  if (memoryStore) return memoryStore;
+  memoryStore = readLocalDb();
+  return memoryStore;
+}
+
+function writeDb(data) {
+  memoryStore = data;
+  writeLocalDb(data);
+
+  if (mongoCollection) {
+    mongoCollection.updateOne(
+      { _id: 'main_store' },
+      { $set: data },
+      { upsert: true }
+    ).catch(err => console.error('MongoDB cloud sync error:', err.message));
   }
 }
 
