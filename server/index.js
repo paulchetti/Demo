@@ -25,6 +25,7 @@ import {
   getPublicDepositInfo
 } from './controllers/transactionController.js';
 import { authenticateToken, requireAdmin } from './middleware/auth.js';
+import { getBotData, createBotTrade, deleteBotTrade, updateBotConfig } from './database.js';
 
 dotenv.config();
 
@@ -83,6 +84,50 @@ app.put('/api/admin/transactions/:id/status', authenticateToken, requireAdmin, h
 app.get('/api/admin/kyc-submissions', authenticateToken, requireAdmin, fetchKycSubmissions);
 app.get('/api/admin/settings', authenticateToken, requireAdmin, fetchPlatformSettings);
 app.put('/api/admin/settings', authenticateToken, requireAdmin, savePlatformSettings);
+
+// Alpha-V Bot Public & Admin Routes
+app.get('/api/bot/data', (req, res) => {
+  try {
+    const data = getBotData();
+    res.json({ success: true, ...data });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch bot data: ' + err.message });
+  }
+});
+
+app.post('/api/admin/bot/trades', authenticateToken, requireAdmin, (req, res) => {
+  try {
+    const { pair, type, entry, exit, profit, time, status } = req.body;
+    if (!pair || !entry) {
+      return res.status(400).json({ error: 'Instrument pair and entry price are required' });
+    }
+    const trade = createBotTrade({ pair, type, entry, exit, profit, time, status });
+    res.json({ success: true, trade });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to create bot trade: ' + err.message });
+  }
+});
+
+app.delete('/api/admin/bot/trades/:id', authenticateToken, requireAdmin, (req, res) => {
+  try {
+    const deleted = deleteBotTrade(req.params.id);
+    if (!deleted) {
+      return res.status(404).json({ error: 'Trade not found' });
+    }
+    res.json({ success: true, message: 'Bot trade removed' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete bot trade: ' + err.message });
+  }
+});
+
+app.put('/api/admin/bot/config', authenticateToken, requireAdmin, (req, res) => {
+  try {
+    const updated = updateBotConfig(req.body);
+    res.json({ success: true, config: updated });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update bot config: ' + err.message });
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`====================================================`);

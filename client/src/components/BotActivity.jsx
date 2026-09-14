@@ -1,13 +1,47 @@
 import React, { useState, useEffect } from 'react';
-import { Cpu, TrendingUp, CheckCircle, Activity, Shield } from 'lucide-react';
+import { Cpu, Shield, TrendingUp, CheckCircle, Activity } from 'lucide-react';
+import { API_BASE } from '../apiConfig.js';
 
 export function BotActivity({ isWeekend = false }) {
   const [trades, setTrades] = useState([
-    { id: 1, pair: 'BTC/USDT', type: 'LONG', entry: '64,280.50', exit: '64,810.00', profit: '+$18.40', time: '10 mins ago', status: 'CLOSED' },
-    { id: 2, pair: 'ETH/USDT', type: 'LONG', entry: '3,490.20', exit: '3,522.80', profit: '+$14.20', time: '28 mins ago', status: 'CLOSED' },
-    { id: 3, pair: 'SOL/USDT', type: 'LONG', entry: '152.10', exit: '154.90', profit: '+$17.40', time: '45 mins ago', status: 'CLOSED' },
-    { id: 4, pair: 'BTC/USDT', type: 'SHORT', entry: '65,120.00', exit: '64,950.00', profit: '+$12.50', time: '2 hours ago', status: 'CLOSED' }
+    { id: '1', pair: 'BTC/USDT', type: 'LONG', entry: '64,280.50', exit: '64,810.00', profit: '+$18.40', time: '10 mins ago', status: 'CLOSED' },
+    { id: '2', pair: 'ETH/USDT', type: 'LONG', entry: '3,490.20', exit: '3,522.80', profit: '+$14.20', time: '28 mins ago', status: 'CLOSED' },
+    { id: '3', pair: 'SOL/USDT', type: 'LONG', entry: '152.10', exit: '154.90', profit: '+$17.40', time: '45 mins ago', status: 'CLOSED' },
+    { id: '4', pair: 'BTC/USDT', type: 'SHORT', entry: '65,120.00', exit: '64,950.00', profit: '+$12.50', time: '2 hours ago', status: 'CLOSED' }
   ]);
+
+  const [botConfig, setBotConfig] = useState({
+    status: 'ACTIVE',
+    dailyYield: '+$50.00 USD',
+    winRate: '94.2%',
+    schedule: 'Monday – Friday',
+    riskProtocol: 'Capital Shielded'
+  });
+
+  useEffect(() => {
+    fetchBotData();
+    const interval = setInterval(fetchBotData, 20000); // 20s live sync
+    return () => clearInterval(interval);
+  }, []);
+
+  async function fetchBotData() {
+    try {
+      const res = await fetch(`${API_BASE}/api/bot/data`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.trades && Array.isArray(data.trades)) {
+          setTrades(data.trades);
+        }
+        if (data.config) {
+          setBotConfig(data.config);
+        }
+      }
+    } catch (err) {
+      // Fallback silently to existing state
+    }
+  }
+
+  const isPaused = isWeekend || botConfig.status === 'PAUSED';
 
   return (
     <div className="glass-panel" style={{ padding: '20px', marginBottom: '24px' }}>
@@ -31,14 +65,14 @@ export function BotActivity({ isWeekend = false }) {
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span className={`badge ${isWeekend ? 'badge-gold' : 'badge-emerald'}`}>
+          <span className={`badge ${isPaused ? 'badge-gold' : 'badge-emerald'}`}>
             <span style={{
               width: '6px',
               height: '6px',
               borderRadius: '50%',
-              backgroundColor: isWeekend ? '#ffb703' : '#00e676'
+              backgroundColor: isPaused ? '#ffb703' : '#00e676'
             }}></span>
-            {isWeekend ? 'Weekend Paused' : 'Bot Active & Profiting'}
+            {isPaused ? (isWeekend ? 'Weekend Paused' : 'Bot Engine Paused') : 'Bot Active & Profiting'}
           </span>
         </div>
       </div>
@@ -52,70 +86,99 @@ export function BotActivity({ isWeekend = false }) {
       }}>
         <div style={{ background: '#090d16', padding: '10px 14px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
           <div style={{ fontSize: '10px', color: '#9ca3af', textTransform: 'uppercase' }}>Daily Strategy Yield</div>
-          <div style={{ fontSize: '16px', fontWeight: 700, color: isWeekend ? '#9ca3af' : '#00e676', fontFamily: 'JetBrains Mono' }}>
-            {isWeekend ? '$0.00 (Paused)' : '+$50.00 USD'}
+          <div style={{ fontSize: '16px', fontWeight: 700, color: isPaused ? '#9ca3af' : '#00e676', fontFamily: 'JetBrains Mono' }}>
+            {isPaused ? '$0.00 (Paused)' : botConfig.dailyYield || '+$50.00 USD'}
           </div>
         </div>
 
         <div style={{ background: '#090d16', padding: '10px 14px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
           <div style={{ fontSize: '10px', color: '#9ca3af', textTransform: 'uppercase' }}>Model Win Rate</div>
           <div style={{ fontSize: '16px', fontWeight: 700, color: '#00f2fe', fontFamily: 'JetBrains Mono' }}>
-            94.2%
+            {botConfig.winRate || '94.2%'}
           </div>
         </div>
 
         <div style={{ background: '#090d16', padding: '10px 14px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
           <div style={{ fontSize: '10px', color: '#9ca3af', textTransform: 'uppercase' }}>Trading Schedule</div>
           <div style={{ fontSize: '13px', fontWeight: 600, color: '#ffffff', marginTop: '2px' }}>
-            Monday – Friday
+            {botConfig.schedule || 'Monday – Friday'}
           </div>
         </div>
 
         <div style={{ background: '#090d16', padding: '10px 14px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
           <div style={{ fontSize: '10px', color: '#9ca3af', textTransform: 'uppercase' }}>Risk Protocol</div>
           <div style={{ fontSize: '13px', fontWeight: 600, color: '#00e676', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <Shield size={13} /> Capital Shielded
+            <Shield size={13} /> {botConfig.riskProtocol || 'Capital Shielded'}
           </div>
         </div>
       </div>
 
       {/* Live Strategy Trade Ledger */}
-      <div style={{ fontSize: '12px', fontWeight: 600, color: '#9ca3af', marginBottom: '8px' }}>
-        Recent Algorithmic Trade Executions:
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+        <div style={{ fontSize: '12px', fontWeight: 600, color: '#9ca3af' }}>
+          Recent Algorithmic Trade Executions:
+        </div>
+        <div style={{ fontSize: '11px', color: '#00f2fe', display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: '#00f2fe', display: 'inline-block' }}></span> Live Feed
+        </div>
       </div>
+
       <div style={{
         background: '#070a10',
         borderRadius: '10px',
         border: '1px solid rgba(255, 255, 255, 0.06)',
         overflow: 'hidden'
       }}>
-        {trades.map(t => (
-          <div
-            key={t.id}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '10px 14px',
-              borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
-              fontSize: '12px'
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <span className={`badge ${t.type === 'LONG' ? 'badge-emerald' : 'badge-rose'}`} style={{ fontSize: '10px', padding: '2px 6px' }}>
-                {t.type}
-              </span>
-              <strong style={{ color: '#ffffff', fontFamily: 'JetBrains Mono' }}>{t.pair}</strong>
-              <span style={{ color: '#6b7280', fontSize: '11px' }}>Entry: ${t.entry}</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <span style={{ color: '#00e676', fontWeight: 700, fontFamily: 'JetBrains Mono' }}>
-                {t.profit}
-              </span>
-              <span style={{ color: '#4b5563', fontSize: '11px' }}>{t.time}</span>
-            </div>
+        {trades.length === 0 ? (
+          <div style={{ padding: '16px', textAlign: 'center', color: '#6b7280', fontSize: '12px' }}>
+            No recent trades in ledger. Awaiting algorithm signal...
           </div>
-        ))}
+        ) : (
+          trades.map(t => {
+            const isLong = (t.type || 'LONG').toUpperCase() === 'LONG';
+            const isNegativeProfit = (t.profit || '').startsWith('-');
+            return (
+              <div
+                key={t.id}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '10px 14px',
+                  borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
+                  fontSize: '12px',
+                  flexWrap: 'wrap',
+                  gap: '8px'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                  <span className={`badge ${isLong ? 'badge-emerald' : 'badge-rose'}`} style={{ fontSize: '10px', padding: '2px 6px' }}>
+                    {t.type}
+                  </span>
+                  <strong style={{ color: '#ffffff', fontFamily: 'JetBrains Mono', letterSpacing: '0.5px' }}>{t.pair}</strong>
+                  <span style={{ color: '#9ca3af', fontSize: '11px', fontFamily: 'JetBrains Mono' }}>
+                    Open: <span style={{ color: '#d1d5db' }}>${t.entry}</span>
+                  </span>
+                  {t.exit && (
+                    <span style={{ color: '#9ca3af', fontSize: '11px', fontFamily: 'JetBrains Mono' }}>
+                      Close: <span style={{ color: '#d1d5db' }}>${t.exit}</span>
+                    </span>
+                  )}
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <span style={{
+                    color: isNegativeProfit ? '#ff3366' : '#00e676',
+                    fontWeight: 700,
+                    fontFamily: 'JetBrains Mono'
+                  }}>
+                    {t.profit}
+                  </span>
+                  <span style={{ color: '#4b5563', fontSize: '11px' }}>{t.time}</span>
+                </div>
+              </div>
+            );
+          })
+        )}
       </div>
     </div>
   );

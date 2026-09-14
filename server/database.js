@@ -25,6 +25,21 @@ const DEFAULT_SETTINGS = {
   smtpSender: 'Trading Trends <no-reply@tradingtrends.com>'
 };
 
+export const DEFAULT_BOT_CONFIG = {
+  status: 'ACTIVE', // 'ACTIVE' or 'PAUSED'
+  dailyYield: '+$50.00 USD',
+  winRate: '94.2%',
+  schedule: 'Monday – Friday',
+  riskProtocol: 'Capital Shielded'
+};
+
+export const DEFAULT_BOT_TRADES = [
+  { id: 'trade-1', pair: 'BTC/USDT', type: 'LONG', entry: '64,280.50', exit: '64,810.00', profit: '+$18.40', time: '10 mins ago', status: 'CLOSED' },
+  { id: 'trade-2', pair: 'ETH/USDT', type: 'LONG', entry: '3,490.20', exit: '3,522.80', profit: '+$14.20', time: '28 mins ago', status: 'CLOSED' },
+  { id: 'trade-3', pair: 'SOL/USDT', type: 'LONG', entry: '152.10', exit: '154.90', profit: '+$17.40', time: '45 mins ago', status: 'CLOSED' },
+  { id: 'trade-4', pair: 'BTC/USDT', type: 'SHORT', entry: '65,120.00', exit: '64,950.00', profit: '+$12.50', time: '2 hours ago', status: 'CLOSED' }
+];
+
 function readDb() {
   try {
     if (!fs.existsSync(DB_FILE)) {
@@ -32,7 +47,9 @@ function readDb() {
         users: [],
         transactions: [],
         kycSubmissions: [],
-        settings: { ...DEFAULT_SETTINGS }
+        settings: { ...DEFAULT_SETTINGS },
+        botConfig: { ...DEFAULT_BOT_CONFIG },
+        botTrades: [...DEFAULT_BOT_TRADES]
       };
       // Create initial default admin
       const salt = bcrypt.genSaltSync(10);
@@ -60,10 +77,20 @@ function readDb() {
       return initialDb;
     }
     const raw = fs.readFileSync(DB_FILE, 'utf-8');
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    if (!parsed.botTrades || !Array.isArray(parsed.botTrades)) parsed.botTrades = [...DEFAULT_BOT_TRADES];
+    if (!parsed.botConfig) parsed.botConfig = { ...DEFAULT_BOT_CONFIG };
+    return parsed;
   } catch (err) {
     console.error('Error reading database file:', err);
-    return { users: [], transactions: [], kycSubmissions: [], settings: { ...DEFAULT_SETTINGS } };
+    return {
+      users: [],
+      transactions: [],
+      kycSubmissions: [],
+      settings: { ...DEFAULT_SETTINGS },
+      botConfig: { ...DEFAULT_BOT_CONFIG },
+      botTrades: [...DEFAULT_BOT_TRADES]
+    };
   }
 }
 
@@ -236,3 +263,53 @@ export function getAllKycSubmissions() {
   const db = readDb();
   return db.kycSubmissions || [];
 }
+
+// Bot Trades & Config Helpers
+export function getBotData() {
+  const db = readDb();
+  return {
+    config: db.botConfig || { ...DEFAULT_BOT_CONFIG },
+    trades: db.botTrades || [...DEFAULT_BOT_TRADES]
+  };
+}
+
+export function createBotTrade(tradeData) {
+  const db = readDb();
+  if (!db.botTrades) db.botTrades = [...DEFAULT_BOT_TRADES];
+  const newTrade = {
+    id: 'trade-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7),
+    pair: tradeData.pair || 'BTC/USDT',
+    type: (tradeData.type || 'LONG').toUpperCase(),
+    entry: tradeData.entry || '0.00',
+    exit: tradeData.exit || '0.00',
+    profit: tradeData.profit || '+$0.00',
+    time: tradeData.time || 'Just now',
+    status: tradeData.status || 'CLOSED',
+    createdAt: new Date().toISOString()
+  };
+  db.botTrades.unshift(newTrade);
+  writeDb(db);
+  return newTrade;
+}
+
+export function deleteBotTrade(id) {
+  const db = readDb();
+  if (!db.botTrades) return false;
+  const idx = db.botTrades.findIndex(t => t.id === id);
+  if (idx === -1) return false;
+  db.botTrades.splice(idx, 1);
+  writeDb(db);
+  return true;
+}
+
+export function updateBotConfig(updates) {
+  const db = readDb();
+  db.botConfig = {
+    ...DEFAULT_BOT_CONFIG,
+    ...db.botConfig,
+    ...updates
+  };
+  writeDb(db);
+  return db.botConfig;
+}
+

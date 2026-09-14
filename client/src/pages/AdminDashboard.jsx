@@ -21,7 +21,10 @@ import {
   AlertTriangle,
   RefreshCw,
   Sliders,
-  ExternalLink
+  ExternalLink,
+  Cpu,
+  Plus,
+  TrendingUp
 } from 'lucide-react';
 
 export function AdminDashboard() {
@@ -59,6 +62,27 @@ export function AdminDashboard() {
   // Edit user form state
   const [editUserForm, setEditUserForm] = useState({});
 
+  // Alpha-V Bot Trades & Metrics State
+  const [botTrades, setBotTrades] = useState([]);
+  const [botConfig, setBotConfig] = useState({
+    status: 'ACTIVE',
+    dailyYield: '+$50.00 USD',
+    winRate: '94.2%',
+    schedule: 'Monday – Friday',
+    riskProtocol: 'Capital Shielded'
+  });
+  const [newTradeForm, setNewTradeForm] = useState({
+    pair: 'BTC/USDT',
+    type: 'LONG',
+    entry: '',
+    exit: '',
+    profit: '+$',
+    time: 'Just now',
+    status: 'CLOSED'
+  });
+  const [tradePosting, setTradePosting] = useState(false);
+  const [botConfigSaving, setBotConfigSaving] = useState(false);
+
   useEffect(() => {
     loadAllData();
   }, []);
@@ -69,24 +93,30 @@ export function AdminDashboard() {
     const headers = { Authorization: `Bearer ${token}` };
 
     try {
-      const [usersRes, txsRes, kycRes, settingsRes] = await Promise.all([
+      const [usersRes, txsRes, kycRes, settingsRes, botRes] = await Promise.all([
         fetch(`${API_BASE}/api/admin/users`, { headers }),
         fetch(`${API_BASE}/api/admin/transactions`, { headers }),
         fetch(`${API_BASE}/api/admin/kyc-submissions`, { headers }),
-        fetch(`${API_BASE}/api/admin/settings`, { headers })
+        fetch(`${API_BASE}/api/admin/settings`, { headers }),
+        fetch(`${API_BASE}/api/bot/data`)
       ]);
 
-      const [usersData, txsData, kycData, settingsData] = await Promise.all([
+      const [usersData, txsData, kycData, settingsData, botData] = await Promise.all([
         usersRes.json(),
         txsRes.json(),
         kycRes.json(),
-        settingsRes.json()
+        settingsRes.json(),
+        botRes.json()
       ]);
 
       if (usersData.success) setUsers(usersData.users);
       if (txsData.success) setTransactions(txsData.transactions);
       if (kycData.success) setKycSubmissions(kycData.submissions);
       if (settingsData.success) setSettings(settingsData.settings);
+      if (botData.success) {
+        if (botData.trades) setBotTrades(botData.trades);
+        if (botData.config) setBotConfig(botData.config);
+      }
     } catch (err) {
       console.error('Error loading admin data:', err);
     } finally {
@@ -235,6 +265,91 @@ export function AdminDashboard() {
     }
   }
 
+  async function handleCreateBotTrade(e) {
+    e.preventDefault();
+    if (!newTradeForm.pair || !newTradeForm.entry) {
+      alert('Instrument pair and entry price are required');
+      return;
+    }
+    setTradePosting(true);
+    const token = localStorage.getItem('tt_token');
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/bot/trades`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(newTradeForm)
+      });
+      const data = await res.json();
+      if (data.success) {
+        setBotTrades([data.trade, ...botTrades]);
+        setNewTradeForm({
+          pair: 'BTC/USDT',
+          type: 'LONG',
+          entry: '',
+          exit: '',
+          profit: '+$',
+          time: 'Just now',
+          status: 'CLOSED'
+        });
+        alert('Bot trade successfully broadcasted to all user dashboards!');
+      } else {
+        alert(data.error || 'Failed to broadcast trade');
+      }
+    } catch (err) {
+      alert('Error broadcasting trade: ' + err.message);
+    } finally {
+      setTradePosting(false);
+    }
+  }
+
+  async function handleDeleteBotTrade(tradeId) {
+    if (!confirm('Are you sure you want to remove this trade execution from the live ledger?')) return;
+    const token = localStorage.getItem('tt_token');
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/bot/trades/${tradeId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.success) {
+        setBotTrades(botTrades.filter(t => t.id !== tradeId));
+      } else {
+        alert(data.error || 'Failed to delete trade');
+      }
+    } catch (err) {
+      alert('Error deleting trade: ' + err.message);
+    }
+  }
+
+  async function handleSaveBotConfig(e) {
+    e.preventDefault();
+    setBotConfigSaving(true);
+    const token = localStorage.getItem('tt_token');
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/bot/config`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(botConfig)
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('Bot display metrics saved successfully across all user dashboards!');
+      } else {
+        alert(data.error || 'Failed to update bot settings');
+      }
+    } catch (err) {
+      alert('Error updating bot metrics: ' + err.message);
+    } finally {
+      setBotConfigSaving(false);
+    }
+  }
+
   function handleApproveKycToNewUser(sub) {
     setNewUserForm({
       username: sub.name.toLowerCase().replace(/[^a-z0-9]/g, '') + Math.floor(Math.random() * 100),
@@ -328,6 +443,7 @@ export function AdminDashboard() {
           { id: 'USERS', label: `Registered Users (${users.length})`, icon: Users },
           { id: 'KYC', label: `KYC Inquiries (${kycSubmissions.length})`, icon: FileText },
           { id: 'TRANSACTIONS', label: `Withdrawals & Deposits (${transactions.filter(t => t.status === 'PENDING').length} Pending)`, icon: ArrowUpFromLine },
+          { id: 'BOT_TRADES', label: `Alpha-V Bot Trades (${botTrades.length})`, icon: Cpu },
           { id: 'SETTINGS', label: 'Platform & Deposit Settings', icon: Settings }
         ].map(tab => {
           const Icon = tab.icon;
@@ -775,6 +891,366 @@ export function AdminDashboard() {
               Save Platform Settings
             </button>
           </form>
+        </div>
+      )}
+
+      {/* TAB 5: ALPHA-V BOT CONTROL & TRADES */}
+      {activeTab === 'BOT_TRADES' && (
+        <div>
+          {/* Card 1: Form to Broadcast New Trade */}
+          <div className="glass-panel" style={{ padding: '24px', marginBottom: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '18px' }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '10px',
+                background: 'rgba(0, 242, 254, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <Cpu size={22} color="#00f2fe" />
+              </div>
+              <div>
+                <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#ffffff' }}>
+                  Broadcast New Algorithmic Trade
+                </h3>
+                <p style={{ fontSize: '12px', color: '#9ca3af' }}>
+                  Admin trade broadcaster: Add instrument (BTC/USDT, XAUUSD, etc.), side (LONG/SHORT), entry price, exit price, and profit. Instantly shows on every user dashboard.
+                </p>
+              </div>
+            </div>
+
+            <form onSubmit={handleCreateBotTrade}>
+              {/* Quick Select Instrument Pills */}
+              <div style={{ marginBottom: '14px' }}>
+                <label style={{ display: 'block', fontSize: '11px', color: '#9ca3af', marginBottom: '6px' }}>
+                  Quick-Select Instrument:
+                </label>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  {['BTC/USDT', 'ETH/USDT', 'SOL/USDT', 'XAUUSD', 'EUR/USD', 'GBP/USD', 'BNB/USDT', 'NDX100'].map(sym => (
+                    <button
+                      type="button"
+                      key={sym}
+                      onClick={() => setNewTradeForm({ ...newTradeForm, pair: sym })}
+                      style={{
+                        padding: '4px 10px',
+                        borderRadius: '6px',
+                        fontSize: '11px',
+                        fontFamily: 'JetBrains Mono',
+                        border: newTradeForm.pair === sym ? '1px solid #00f2fe' : '1px solid rgba(255, 255, 255, 0.1)',
+                        background: newTradeForm.pair === sym ? 'rgba(0, 242, 254, 0.15)' : 'rgba(255, 255, 255, 0.03)',
+                        color: newTradeForm.pair === sym ? '#00f2fe' : '#d1d5db',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {sym}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px', marginBottom: '14px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', color: '#ffffff', marginBottom: '4px' }}>
+                    Instrument / Pair *
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. BTC/USDT or XAUUSD"
+                    value={newTradeForm.pair}
+                    onChange={e => setNewTradeForm({ ...newTradeForm, pair: e.target.value.toUpperCase() })}
+                    className="input-field"
+                    style={{ fontFamily: 'JetBrains Mono' }}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', color: '#ffffff', marginBottom: '4px' }}>
+                    Trade Type / Position Side *
+                  </label>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button
+                      type="button"
+                      onClick={() => setNewTradeForm({ ...newTradeForm, type: 'LONG' })}
+                      style={{
+                        flex: 1,
+                        padding: '9px',
+                        borderRadius: '8px',
+                        border: newTradeForm.type === 'LONG' ? '1px solid #00e676' : '1px solid rgba(255, 255, 255, 0.1)',
+                        background: newTradeForm.type === 'LONG' ? 'rgba(0, 230, 118, 0.15)' : 'rgba(255, 255, 255, 0.03)',
+                        color: newTradeForm.type === 'LONG' ? '#00e676' : '#9ca3af',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        fontSize: '13px'
+                      }}
+                    >
+                      🟢 LONG (BUY)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setNewTradeForm({ ...newTradeForm, type: 'SHORT' })}
+                      style={{
+                        flex: 1,
+                        padding: '9px',
+                        borderRadius: '8px',
+                        border: newTradeForm.type === 'SHORT' ? '1px solid #ff3366' : '1px solid rgba(255, 255, 255, 0.1)',
+                        background: newTradeForm.type === 'SHORT' ? 'rgba(255, 51, 102, 0.15)' : 'rgba(255, 255, 255, 0.03)',
+                        color: newTradeForm.type === 'SHORT' ? '#ff3366' : '#9ca3af',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        fontSize: '13px'
+                      }}
+                    >
+                      🔴 SHORT (SELL)
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', color: '#ffffff', marginBottom: '4px' }}>
+                    Opened / Entry Price ($) *
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 64,280.50 or 2,345.20"
+                    value={newTradeForm.entry}
+                    onChange={e => setNewTradeForm({ ...newTradeForm, entry: e.target.value })}
+                    className="input-field"
+                    style={{ fontFamily: 'JetBrains Mono' }}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', color: '#ffffff', marginBottom: '4px' }}>
+                    Closed / Exit Price ($)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 64,810.00 or 2,360.50"
+                    value={newTradeForm.exit}
+                    onChange={e => setNewTradeForm({ ...newTradeForm, exit: e.target.value })}
+                    className="input-field"
+                    style={{ fontFamily: 'JetBrains Mono' }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px', marginBottom: '18px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', color: '#ffffff', marginBottom: '4px' }}>
+                    Profit / PnL Realized *
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. +$18.40 or +$24.50"
+                    value={newTradeForm.profit}
+                    onChange={e => setNewTradeForm({ ...newTradeForm, profit: e.target.value })}
+                    className="input-field"
+                    style={{ fontFamily: 'JetBrains Mono', color: '#00e676', fontWeight: 700 }}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', color: '#ffffff', marginBottom: '4px' }}>
+                    Time Tag (Display Label) *
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Just now, 10 mins ago, 1 hour ago"
+                    value={newTradeForm.time}
+                    onChange={e => setNewTradeForm({ ...newTradeForm, time: e.target.value })}
+                    className="input-field"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', color: '#ffffff', marginBottom: '4px' }}>
+                    Execution Status
+                  </label>
+                  <select
+                    value={newTradeForm.status}
+                    onChange={e => setNewTradeForm({ ...newTradeForm, status: e.target.value })}
+                    className="input-field"
+                  >
+                    <option value="CLOSED">CLOSED (Take Profit)</option>
+                    <option value="OPEN">OPEN (Active Position)</option>
+                  </select>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={tradePosting}
+                style={{ padding: '12px 24px', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}
+              >
+                <Cpu size={16} /> {tradePosting ? 'Broadcasting...' : 'Broadcast Trade to All User Dashboards'}
+              </button>
+            </form>
+          </div>
+
+          {/* Card 2: Current Live Bot Ledger Table */}
+          <div className="glass-panel" style={{ padding: '24px', marginBottom: '24px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <div>
+                <h4 style={{ fontSize: '16px', fontWeight: 700, color: '#ffffff' }}>
+                  Live Trades Displayed on User Dashboards ({botTrades.length})
+                </h4>
+                <p style={{ fontSize: '12px', color: '#9ca3af' }}>
+                  Real-time list. Any trade deleted here will disappear from user screens instantly.
+                </p>
+              </div>
+            </div>
+
+            <div className="table-container">
+              <table className="custom-table">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Instrument / Pair</th>
+                    <th>Open (Entry)</th>
+                    <th>Close (Exit)</th>
+                    <th>Profit (PnL)</th>
+                    <th>Time Display</th>
+                    <th>Status</th>
+                    <th style={{ textAlign: 'right' }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {botTrades.length === 0 ? (
+                    <tr>
+                      <td colSpan="8" style={{ textAlign: 'center', padding: '28px', color: '#6b7280' }}>
+                        No bot trades in registry. Use the form above to add your first trade execution!
+                      </td>
+                    </tr>
+                  ) : (
+                    botTrades.map(trade => {
+                      const isLong = (trade.type || 'LONG').toUpperCase() === 'LONG';
+                      return (
+                        <tr key={trade.id}>
+                          <td>
+                            <span className={`badge ${isLong ? 'badge-emerald' : 'badge-rose'}`}>
+                              {trade.type}
+                            </span>
+                          </td>
+                          <td style={{ fontFamily: 'JetBrains Mono', fontWeight: 700, color: '#ffffff' }}>
+                            {trade.pair}
+                          </td>
+                          <td style={{ fontFamily: 'JetBrains Mono', color: '#9ca3af' }}>
+                            ${trade.entry}
+                          </td>
+                          <td style={{ fontFamily: 'JetBrains Mono', color: '#9ca3af' }}>
+                            {trade.exit ? `$${trade.exit}` : '—'}
+                          </td>
+                          <td style={{ fontFamily: 'JetBrains Mono', color: '#00e676', fontWeight: 700 }}>
+                            {trade.profit}
+                          </td>
+                          <td style={{ color: '#9ca3af', fontSize: '12px' }}>
+                            {trade.time}
+                          </td>
+                          <td>
+                            <span className="badge badge-emerald" style={{ fontSize: '10px' }}>
+                              {trade.status || 'CLOSED'}
+                            </span>
+                          </td>
+                          <td style={{ textAlign: 'right' }}>
+                            <button
+                              className="btn btn-secondary"
+                              onClick={() => handleDeleteBotTrade(trade.id)}
+                              style={{ padding: '4px 10px', fontSize: '11px', color: '#ff3366', border: '1px solid rgba(255, 51, 102, 0.3)' }}
+                              title="Delete trade"
+                            >
+                              <Trash2 size={13} /> Delete
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Card 3: Bot Performance & Metrics Configuration */}
+          <div className="glass-panel" style={{ padding: '24px' }}>
+            <h4 style={{ fontSize: '16px', fontWeight: 700, color: '#ffffff', marginBottom: '8px' }}>
+              Bot Card Display Metrics
+            </h4>
+            <p style={{ fontSize: '12px', color: '#9ca3af', marginBottom: '18px' }}>
+              Customize the statistics and badges displayed at the top of the Alpha-V Bot card on all user dashboards.
+            </p>
+
+            <form onSubmit={handleSaveBotConfig}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px', marginBottom: '18px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', color: '#9ca3af', marginBottom: '4px' }}>
+                    Daily Strategy Yield
+                  </label>
+                  <input
+                    type="text"
+                    value={botConfig.dailyYield || ''}
+                    onChange={e => setBotConfig({ ...botConfig, dailyYield: e.target.value })}
+                    className="input-field"
+                    style={{ fontFamily: 'JetBrains Mono', color: '#00e676' }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', color: '#9ca3af', marginBottom: '4px' }}>
+                    Model Win Rate
+                  </label>
+                  <input
+                    type="text"
+                    value={botConfig.winRate || ''}
+                    onChange={e => setBotConfig({ ...botConfig, winRate: e.target.value })}
+                    className="input-field"
+                    style={{ fontFamily: 'JetBrains Mono', color: '#00f2fe' }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', color: '#9ca3af', marginBottom: '4px' }}>
+                    Trading Schedule Label
+                  </label>
+                  <input
+                    type="text"
+                    value={botConfig.schedule || ''}
+                    onChange={e => setBotConfig({ ...botConfig, schedule: e.target.value })}
+                    className="input-field"
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', color: '#9ca3af', marginBottom: '4px' }}>
+                    Engine Status
+                  </label>
+                  <select
+                    value={botConfig.status || 'ACTIVE'}
+                    onChange={e => setBotConfig({ ...botConfig, status: e.target.value })}
+                    className="input-field"
+                  >
+                    <option value="ACTIVE">ACTIVE (Bot Active & Profiting)</option>
+                    <option value="PAUSED">PAUSED (Bot Engine Paused)</option>
+                  </select>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={botConfigSaving}
+                style={{ padding: '10px 20px', fontSize: '13px' }}
+              >
+                {botConfigSaving ? 'Saving...' : 'Save Bot Display Metrics'}
+              </button>
+            </form>
+          </div>
         </div>
       )}
 
