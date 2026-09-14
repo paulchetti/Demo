@@ -381,7 +381,7 @@ export function AdminDashboard() {
   );
 
   return (
-    <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '30px 24px 80px' }}>
+    <div className="dashboard-container">
       {/* Admin Top Header */}
       <div style={{
         display: 'flex',
@@ -389,12 +389,13 @@ export function AdminDashboard() {
         justifyContent: 'space-between',
         alignItems: 'center',
         gap: '16px',
-        marginBottom: '28px'
+        marginBottom: '24px'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div style={{
             width: '44px',
             height: '44px',
+            minWidth: '44px',
             borderRadius: '12px',
             background: 'linear-gradient(135deg, #ffb703 0%, #fb8500 100%)',
             display: 'flex',
@@ -405,16 +406,16 @@ export function AdminDashboard() {
             <Shield size={24} color="#050b14" />
           </div>
           <div>
-            <h1 style={{ fontSize: '26px', fontWeight: 800, color: '#ffffff' }}>
+            <h1 style={{ fontSize: 'clamp(20px, 4vw, 26px)', fontWeight: 800, color: '#ffffff', lineHeight: 1.2 }}>
               Trading Trends Super-Admin Portal
             </h1>
-            <p style={{ color: '#9ca3af', fontSize: '13px' }}>
+            <p style={{ color: '#9ca3af', fontSize: '13px', marginTop: '4px' }}>
               Full Control Management: Onboarding, Wallet Compounding, Deposits, and Payout Approvals
             </p>
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
           <button
             className="btn btn-secondary"
             onClick={loadAllData}
@@ -433,12 +434,7 @@ export function AdminDashboard() {
       </div>
 
       {/* Navigation Tabs */}
-      <div style={{
-        display: 'flex',
-        gap: '8px',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-        marginBottom: '24px'
-      }}>
+      <div className="responsive-tabs-bar" style={{ marginBottom: '24px' }}>
         {[
           { id: 'USERS', label: `Registered Users (${users.length})`, icon: Users },
           { id: 'KYC', label: `KYC Inquiries (${kycSubmissions.length})`, icon: FileText },
@@ -456,7 +452,7 @@ export function AdminDashboard() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
-                padding: '12px 18px',
+                padding: '12px 16px',
                 background: 'transparent',
                 border: 'none',
                 borderBottom: isActive ? '2px solid #00f2fe' : '2px solid transparent',
@@ -464,6 +460,8 @@ export function AdminDashboard() {
                 fontWeight: 600,
                 fontSize: '14px',
                 cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                flexShrink: 0,
                 transition: 'all 0.2s'
               }}
             >
@@ -502,8 +500,8 @@ export function AdminDashboard() {
             </div>
           </div>
 
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', textAlign: 'left' }}>
+          <div className="table-responsive-container">
+            <table style={{ width: '100%', minWidth: '820px', borderCollapse: 'collapse', fontSize: '13px', textAlign: 'left' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)', color: '#9ca3af' }}>
                   <th style={{ padding: '12px 10px' }}>User Details</th>
@@ -693,8 +691,8 @@ export function AdminDashboard() {
             </p>
           </div>
 
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', textAlign: 'left' }}>
+          <div className="table-responsive-container">
+            <table style={{ width: '100%', minWidth: '780px', borderCollapse: 'collapse', fontSize: '13px', textAlign: 'left' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)', color: '#9ca3af' }}>
                   <th style={{ padding: '12px 10px' }}>User</th>
@@ -834,7 +832,7 @@ export function AdminDashboard() {
                 />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '12px', marginBottom: '14px' }}>
+              <div className="responsive-form-grid" style={{ marginBottom: '14px' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '12px', color: '#9ca3af', marginBottom: '6px' }}>
                     SMTP Host (e.g. smtp.gmail.com)
@@ -860,7 +858,7 @@ export function AdminDashboard() {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
+              <div className="responsive-form-grid" style={{ marginBottom: '16px' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '12px', color: '#9ca3af', marginBottom: '6px' }}>
                     SMTP Username / Email
@@ -1263,7 +1261,7 @@ export function AdminDashboard() {
             </h3>
 
             <form onSubmit={handleCreateUser}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+              <div className="responsive-form-grid" style={{ marginBottom: '12px' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '11px', color: '#9ca3af', marginBottom: '4px' }}>
                     Username *
@@ -1290,7 +1288,7 @@ export function AdminDashboard() {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+              <div className="responsive-form-grid" style={{ marginBottom: '12px' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '11px', color: '#9ca3af', marginBottom: '4px' }}>
                     Full Name *
@@ -1317,7 +1315,7 @@ export function AdminDashboard() {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+              <div className="responsive-form-grid" style={{ marginBottom: '12px' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '11px', color: '#9ca3af', marginBottom: '4px' }}>
                     Phone Number
@@ -1354,7 +1352,7 @@ export function AdminDashboard() {
                 />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
+              <div className="responsive-form-grid" style={{ marginBottom: '16px' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '11px', color: '#9ca3af', marginBottom: '4px' }}>
                     Aadhaar Number
@@ -1391,7 +1389,7 @@ export function AdminDashboard() {
                   Wallet Balance & Compounding Rate
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+                <div className="responsive-form-grid" style={{ gap: '14px' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '12px', color: '#ffffff', marginBottom: '4px' }}>
                       Initial Deposited Capital (USD) *
@@ -1490,7 +1488,7 @@ export function AdminDashboard() {
                 </p>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+              <div className="responsive-form-grid" style={{ marginBottom: '12px' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '11px', color: '#9ca3af', marginBottom: '4px' }}>
                     Daily Growth Rate (Mon-Fri)
@@ -1518,7 +1516,7 @@ export function AdminDashboard() {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+              <div className="responsive-form-grid" style={{ marginBottom: '12px' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '11px', color: '#9ca3af', marginBottom: '4px' }}>
                     Full Name
@@ -1543,7 +1541,7 @@ export function AdminDashboard() {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+              <div className="responsive-form-grid" style={{ marginBottom: '12px' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '11px', color: '#9ca3af', marginBottom: '4px' }}>
                     Phone Number
@@ -1580,7 +1578,7 @@ export function AdminDashboard() {
                 />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '14px' }}>
+              <div className="responsive-form-grid" style={{ marginBottom: '14px' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '11px', color: '#9ca3af', marginBottom: '4px' }}>
                     Aadhaar Number

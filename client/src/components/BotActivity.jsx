@@ -78,36 +78,31 @@ export function BotActivity({ isWeekend = false }) {
       </div>
 
       {/* Bot Key Metrics */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
-        gap: '12px',
-        marginBottom: '16px'
-      }}>
-        <div style={{ background: '#090d16', padding: '10px 14px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+      <div className="bot-metrics-grid">
+        <div style={{ background: '#090d16', padding: '10px 12px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
           <div style={{ fontSize: '10px', color: '#9ca3af', textTransform: 'uppercase' }}>Daily Strategy Yield</div>
-          <div style={{ fontSize: '16px', fontWeight: 700, color: isPaused ? '#9ca3af' : '#00e676', fontFamily: 'JetBrains Mono' }}>
+          <div style={{ fontSize: '15px', fontWeight: 700, color: isPaused ? '#9ca3af' : '#00e676', fontFamily: 'JetBrains Mono', marginTop: '2px' }}>
             {isPaused ? '$0.00 (Paused)' : botConfig.dailyYield || '+$50.00 USD'}
           </div>
         </div>
 
-        <div style={{ background: '#090d16', padding: '10px 14px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+        <div style={{ background: '#090d16', padding: '10px 12px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
           <div style={{ fontSize: '10px', color: '#9ca3af', textTransform: 'uppercase' }}>Model Win Rate</div>
-          <div style={{ fontSize: '16px', fontWeight: 700, color: '#00f2fe', fontFamily: 'JetBrains Mono' }}>
+          <div style={{ fontSize: '15px', fontWeight: 700, color: '#00f2fe', fontFamily: 'JetBrains Mono', marginTop: '2px' }}>
             {botConfig.winRate || '94.2%'}
           </div>
         </div>
 
-        <div style={{ background: '#090d16', padding: '10px 14px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+        <div style={{ background: '#090d16', padding: '10px 12px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
           <div style={{ fontSize: '10px', color: '#9ca3af', textTransform: 'uppercase' }}>Trading Schedule</div>
-          <div style={{ fontSize: '13px', fontWeight: 600, color: '#ffffff', marginTop: '2px' }}>
+          <div style={{ fontSize: '12px', fontWeight: 600, color: '#ffffff', marginTop: '4px' }}>
             {botConfig.schedule || 'Monday – Friday'}
           </div>
         </div>
 
-        <div style={{ background: '#090d16', padding: '10px 14px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+        <div style={{ background: '#090d16', padding: '10px 12px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
           <div style={{ fontSize: '10px', color: '#9ca3af', textTransform: 'uppercase' }}>Risk Protocol</div>
-          <div style={{ fontSize: '13px', fontWeight: 600, color: '#00e676', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <div style={{ fontSize: '12px', fontWeight: 600, color: '#00e676', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
             <Shield size={13} /> {botConfig.riskProtocol || 'Capital Shielded'}
           </div>
         </div>
@@ -140,32 +135,15 @@ export function BotActivity({ isWeekend = false }) {
             return (
               <div
                 key={t.id}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '10px 14px',
-                  borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
-                  fontSize: '12px',
-                  flexWrap: 'wrap',
-                  gap: '8px'
-                }}
+                className="bot-trade-row"
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                  <span className={`badge ${isLong ? 'badge-emerald' : 'badge-rose'}`} style={{ fontSize: '10px', padding: '2px 6px' }}>
-                    {t.type}
-                  </span>
-                  <strong style={{ color: '#ffffff', fontFamily: 'JetBrains Mono', letterSpacing: '0.5px' }}>{t.pair}</strong>
-                  <span style={{ color: '#9ca3af', fontSize: '11px', fontFamily: 'JetBrains Mono' }}>
-                    Open: <span style={{ color: '#d1d5db' }}>${t.entry}</span>
-                  </span>
-                  {t.exit && (
-                    <span style={{ color: '#9ca3af', fontSize: '11px', fontFamily: 'JetBrains Mono' }}>
-                      Close: <span style={{ color: '#d1d5db' }}>${t.exit}</span>
+                <div className="bot-trade-top-line">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span className={`badge ${isLong ? 'badge-emerald' : 'badge-rose'}`} style={{ fontSize: '10px', padding: '2px 6px' }}>
+                      {t.type}
                     </span>
-                  )}
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <strong style={{ color: '#ffffff', fontFamily: 'JetBrains Mono', letterSpacing: '0.5px' }}>{t.pair}</strong>
+                  </div>
                   <span style={{
                     color: isNegativeProfit ? '#ff3366' : '#00e676',
                     fontWeight: 700,
@@ -173,7 +151,14 @@ export function BotActivity({ isWeekend = false }) {
                   }}>
                     {t.profit}
                   </span>
-                  <span style={{ color: '#4b5563', fontSize: '11px' }}>{t.time}</span>
+                </div>
+
+                <div className="bot-trade-bottom-line">
+                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                    <span>Open: <strong style={{ color: '#d1d5db' }}>${t.entry}</strong></span>
+                    {t.exit && <span>Close: <strong style={{ color: '#d1d5db' }}>${t.exit}</strong></span>}
+                  </div>
+                  <span>{t.time}</span>
                 </div>
               </div>
             );

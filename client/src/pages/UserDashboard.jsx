@@ -78,27 +78,27 @@ export function UserDashboard() {
   const todayProfit = wallet?.todayProfit || 0;
 
   return (
-    <div style={{ maxWidth: '1380px', margin: '0 auto', padding: '30px 24px 80px' }}>
+    <div className="dashboard-container">
       {/* Dashboard Top Header */}
       <div style={{
         display: 'flex',
         flexWrap: 'wrap',
         justifyContent: 'space-between',
         alignItems: 'center',
-        gap: '16px',
-        marginBottom: '28px'
+        gap: '14px',
+        marginBottom: '24px'
       }}>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
-            <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#ffffff' }}>
+          <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px', marginBottom: '4px' }}>
+            <h1 style={{ fontSize: 'clamp(20px, 5vw, 28px)', fontWeight: 800, color: '#ffffff' }}>
               Welcome, {user?.fullName || user?.username}
             </h1>
             <span className="badge badge-cyan" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
               <ShieldCheck size={14} /> KYC Verified
             </span>
           </div>
-          <p style={{ color: '#9ca3af', fontSize: '14px' }}>
-            Trading Trends Algorithmic Managed Capital Portfolio • Account ID: <code style={{ color: '#00f2fe' }}>{user?.id}</code>
+          <p style={{ color: '#9ca3af', fontSize: '13px' }}>
+            Trading Trends Algorithmic Managed Capital • Account ID: <code style={{ color: '#00f2fe' }}>{user?.id}</code>
           </p>
         </div>
 
@@ -114,12 +114,7 @@ export function UserDashboard() {
       </div>
 
       {/* Main Highlights Grid */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-        gap: '20px',
-        marginBottom: '28px'
-      }}>
+      <div className="dashboard-highlights-grid">
         {/* Main Wallet Balance Card */}
         <div className="glass-panel glass-panel-glow" style={{ padding: '26px', position: 'relative', overflow: 'hidden' }}>
           <div style={{
@@ -273,46 +268,46 @@ export function UserDashboard() {
             <span className="badge badge-cyan">Compliance Approved</span>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d1d5db' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d1d5db', flexWrap: 'wrap' }}>
               <User size={15} color="#00f2fe" style={{ flexShrink: 0 }} />
-              <span style={{ color: '#9ca3af', width: '70px' }}>Name:</span>
+              <span style={{ color: '#9ca3af', minWidth: '65px' }}>Name:</span>
               <strong style={{ color: '#ffffff' }}>{user?.fullName || 'N/A'}</strong>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d1d5db' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d1d5db', flexWrap: 'wrap' }}>
               <Mail size={15} color="#00f2fe" style={{ flexShrink: 0 }} />
-              <span style={{ color: '#9ca3af', width: '70px' }}>Email:</span>
-              <span>{user?.email || 'N/A'}</span>
+              <span style={{ color: '#9ca3af', minWidth: '65px' }}>Email:</span>
+              <span style={{ wordBreak: 'break-all' }}>{user?.email || 'N/A'}</span>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d1d5db' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d1d5db', flexWrap: 'wrap' }}>
               <Phone size={15} color="#00f2fe" style={{ flexShrink: 0 }} />
-              <span style={{ color: '#9ca3af', width: '70px' }}>Phone:</span>
+              <span style={{ color: '#9ca3af', minWidth: '65px' }}>Phone:</span>
               <span>{user?.phone || 'N/A'}</span>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d1d5db' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d1d5db', flexWrap: 'wrap' }}>
               <Calendar size={15} color="#00f2fe" style={{ flexShrink: 0 }} />
-              <span style={{ color: '#9ca3af', width: '70px' }}>DOB:</span>
+              <span style={{ color: '#9ca3af', minWidth: '65px' }}>DOB:</span>
               <span>{user?.dob || 'N/A'}</span>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d1d5db' }}>
-              <MapPin size={15} color="#00f2fe" style={{ flexShrink: 0 }} />
-              <span style={{ color: '#9ca3af', width: '70px' }}>Address:</span>
-              <span style={{ wordBreak: 'break-word' }}>{user?.address || 'N/A'}</span>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', color: '#d1d5db' }}>
+              <MapPin size={15} color="#00f2fe" style={{ flexShrink: 0, marginTop: '2px' }} />
+              <span style={{ color: '#9ca3af', minWidth: '65px' }}>Address:</span>
+              <span style={{ wordBreak: 'break-word', flex: 1 }}>{user?.address || 'N/A'}</span>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d1d5db' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d1d5db', flexWrap: 'wrap' }}>
               <FileCheck size={15} color="#00e676" style={{ flexShrink: 0 }} />
-              <span style={{ color: '#9ca3af', width: '70px' }}>Aadhaar:</span>
+              <span style={{ color: '#9ca3af', minWidth: '65px' }}>Aadhaar:</span>
               <strong style={{ color: '#00e676', fontFamily: 'JetBrains Mono' }}>{user?.aadharNo || 'Verified'}</strong>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d1d5db' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d1d5db', flexWrap: 'wrap' }}>
               <CreditCard size={15} color="#00e676" style={{ flexShrink: 0 }} />
-              <span style={{ color: '#9ca3af', width: '70px' }}>PAN:</span>
+              <span style={{ color: '#9ca3af', minWidth: '65px' }}>PAN:</span>
               <strong style={{ color: '#00e676', fontFamily: 'JetBrains Mono' }}>{user?.panNo || 'Verified'}</strong>
             </div>
           </div>
@@ -326,7 +321,7 @@ export function UserDashboard() {
       <TradingViewWidget />
 
       {/* Daily Growth History & Transactions Tabs */}
-      <div className="glass-panel" style={{ padding: '24px' }}>
+      <div className="glass-panel" style={{ padding: '20px' }}>
         <h4 style={{ fontSize: '18px', fontWeight: 700, color: '#ffffff', marginBottom: '16px' }}>
           Portfolio History & Transactions
         </h4>
@@ -334,11 +329,16 @@ export function UserDashboard() {
         {/* Transactions Table */}
         {myTransactions.length > 0 && (
           <div style={{ marginBottom: '24px' }}>
-            <div style={{ fontSize: '13px', fontWeight: 600, color: '#00f2fe', marginBottom: '8px' }}>
-              Deposits & Withdrawal Requests:
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <span style={{ fontSize: '13px', fontWeight: 600, color: '#00f2fe' }}>
+                Deposits & Withdrawal Requests:
+              </span>
+              <span style={{ fontSize: '11px', color: '#6b7280' }}>
+                ← Scroll to view all →
+              </span>
             </div>
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', textAlign: 'left' }}>
+            <div className="table-responsive-container">
+              <table style={{ width: '100%', minWidth: '550px', borderCollapse: 'collapse', fontSize: '13px', textAlign: 'left' }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)', color: '#9ca3af' }}>
                     <th style={{ padding: '10px' }}>Type</th>
@@ -367,7 +367,7 @@ export function UserDashboard() {
                       <td style={{ padding: '12px 10px', color: '#9ca3af', fontFamily: 'JetBrains Mono', fontSize: '12px' }}>
                         {tx.cryptoAddress || (tx.binanceId ? `Binance: ${tx.binanceId}` : tx.network)}
                       </td>
-                      <td style={{ padding: '12px 10px', color: '#6b7280', fontSize: '12px' }}>
+                      <td style={{ padding: '12px 10px', color: '#6b7280', fontSize: '12px', whiteSpace: 'nowrap' }}>
                         {new Date(tx.createdAt).toLocaleString()}
                       </td>
                     </tr>
@@ -380,11 +380,16 @@ export function UserDashboard() {
 
         {/* Daily Mon-Fri Growth Statement */}
         <div>
-          <div style={{ fontSize: '13px', fontWeight: 600, color: '#00e676', marginBottom: '8px' }}>
-            Automated Daily Profit Timeline (Mon-Fri):
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+            <span style={{ fontSize: '13px', fontWeight: 600, color: '#00e676' }}>
+              Automated Daily Profit Timeline (Mon-Fri):
+            </span>
+            <span style={{ fontSize: '11px', color: '#6b7280' }}>
+              ← Scroll to view all →
+            </span>
           </div>
-          <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', textAlign: 'left' }}>
+          <div className="table-responsive-container" style={{ maxHeight: '340px', overflowY: 'auto' }}>
+            <table style={{ width: '100%', minWidth: '550px', borderCollapse: 'collapse', fontSize: '13px', textAlign: 'left' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)', color: '#9ca3af' }}>
                   <th style={{ padding: '10px' }}>Date</th>
@@ -397,7 +402,7 @@ export function UserDashboard() {
               <tbody>
                 {(wallet?.history || []).map((row, idx) => (
                   <tr key={idx} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.04)' }}>
-                    <td style={{ padding: '10px', color: '#d1d5db', fontFamily: 'JetBrains Mono' }}>
+                    <td style={{ padding: '10px', color: '#d1d5db', fontFamily: 'JetBrains Mono', whiteSpace: 'nowrap' }}>
                       {row.date}
                     </td>
                     <td style={{ padding: '10px', color: '#ffffff' }}>

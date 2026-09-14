@@ -251,3 +251,327 @@ h1, h2, h3, h4, .font-heading {
 ::-webkit-scrollbar-thumb:hover {
   background: #2a3754;
 }
+
+/* Touch-friendly and Responsive Utilities */
+.table-responsive-container,
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 10px;
+}
+
+.table-responsive-container::-webkit-scrollbar,
+.table-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.table-responsive-container::-webkit-scrollbar-thumb,
+.table-container::-webkit-scrollbar-thumb {
+  background: #243048;
+  border-radius: 3px;
+}
+
+.custom-table {
+  width: 100%;
+  min-width: 650px;
+  border-collapse: collapse;
+  font-size: 13px;
+  text-align: left;
+}
+
+.custom-table th {
+  padding: 12px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: #9ca3af;
+  font-weight: 600;
+}
+
+.custom-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+/* Responsive Grid helpers */
+.responsive-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.responsive-upload-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.responsive-tabs-bar {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 24px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 2px;
+}
+
+.responsive-tabs-bar::-webkit-scrollbar {
+  height: 3px;
+}
+.responsive-tabs-bar::-webkit-scrollbar-thumb {
+  background: rgba(0, 242, 254, 0.3);
+  border-radius: 2px;
+}
+
+/* Navbar Responsive Rules */
+.navbar-desktop-actions {
+  display: flex;
+}
+
+.navbar-mobile-controls {
+  display: none;
+}
+
+/* Mobile Media Queries */
+@media (max-width: 768px) {
+  .navbar-desktop-actions {
+    display: none !important;
+  }
+
+  .navbar-mobile-controls {
+    display: flex !important;
+  }
+
+  .modal-overlay {
+    padding: 10px;
+    align-items: flex-end;
+  }
+
+  .modal-content {
+    padding: 20px 16px;
+    max-height: 94vh;
+    border-radius: 20px 20px 14px 14px;
+    width: 100%;
+  }
+
+  .responsive-form-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .responsive-upload-box {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .responsive-upload-box label {
+    text-align: center;
+    width: 100%;
+  }
+
+  .desktop-indicator {
+    display: none !important;
+  }
+
+  .btn {
+    min-height: 42px;
+  }
+
+  .input-field {
+    font-size: 15px; /* prevents iOS auto-zoom on inputs */
+    padding: 12px 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-overlay {
+    padding: 6px;
+  }
+
+  .modal-content {
+    padding: 18px 14px;
+    border-radius: 16px;
+  }
+
+  .btn {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+}
+
+/* Landing Page & Dashboard Layout Styles */
+.landing-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+
+.landing-hero {
+  text-align: center;
+  padding: 60px 0 50px;
+  position: relative;
+}
+
+.landing-cta-row {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.landing-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 60px;
+}
+
+.landing-steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.landing-feature-panel {
+  padding: 40px;
+  background: linear-gradient(135deg, rgba(14, 19, 31, 0.9) 0%, rgba(8, 12, 20, 0.95) 100%);
+  border: 1px solid rgba(0, 242, 254, 0.2);
+}
+
+.landing-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  align-items: center;
+}
+
+/* User Dashboard Layout */
+.dashboard-container {
+  max-width: 1380px;
+  margin: 0 auto;
+  padding: 30px 24px 80px;
+}
+
+.dashboard-highlights-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+/* Tablet & Mobile Media Queries */
+@media (max-width: 768px) {
+  .landing-container {
+    padding: 24px 16px 60px;
+  }
+
+  .landing-hero {
+    padding: 36px 0 30px;
+  }
+
+  .landing-metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-top: 36px;
+  }
+
+  .landing-steps-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .landing-feature-panel {
+    padding: 24px 16px;
+  }
+
+  .landing-feature-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .dashboard-container {
+    padding: 18px 14px 60px;
+  }
+
+  .dashboard-highlights-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .landing-container {
+    padding: 16px 12px 50px;
+  }
+
+  .landing-cta-row button {
+    width: 100%;
+  }
+}
+
+/* Bot Activity Responsive Grid */
+.bot-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.bot-trade-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  font-size: 12px;
+  gap: 8px;
+}
+
+@media (max-width: 768px) {
+  .bot-metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .bot-trade-row {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 10px 12px;
+    gap: 6px;
+  }
+
+  .bot-trade-top-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .bot-trade-bottom-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11px;
+    color: #9ca3af;
+  }
+}
+
+/* TradingView Widget Responsive Height */
+.tradingview-chart-box {
+  height: 360px;
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .tradingview-chart-box {
+    height: 280px;
+  }
+}
+
+
+
+

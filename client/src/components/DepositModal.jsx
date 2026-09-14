@@ -169,14 +169,17 @@ export function DepositModal({ isOpen, onClose }) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            gap: '8px'
+            gap: '10px',
+            flexWrap: 'wrap'
           }}>
             <span style={{
               fontFamily: 'JetBrains Mono',
               fontSize: '13px',
               color: '#00f2fe',
               wordBreak: 'break-all',
-              textAlign: 'left'
+              textAlign: 'left',
+              flex: 1,
+              minWidth: '180px'
             }}>
               {depositInfo.address}
             </span>
@@ -187,7 +190,7 @@ export function DepositModal({ isOpen, onClose }) {
                 color: copied ? '#050b14' : '#00f2fe',
                 border: 'none',
                 borderRadius: '8px',
-                padding: '8px 12px',
+                padding: '8px 14px',
                 fontSize: '12px',
                 fontWeight: 600,
                 cursor: 'pointer',
@@ -222,10 +225,9 @@ export function DepositModal({ isOpen, onClose }) {
           alignItems: 'flex-start'
         }}>
           <AlertTriangle size={18} color="#ffb703" style={{ flexShrink: 0, marginTop: '2px' }} />
-          <div style={{ fontSize: '12px', color: '#d1d5db', lineHeight: '1.5' }}>
-            <strong style={{ color: '#ffb703', display: 'block', marginBottom: '2px' }}>Important Deposit Notice:</strong>
-            {depositInfo.note || 'Please deposit only USDT TRC-20 to this address. Sending any other currency or using another network may result in permanent loss. Contact support after transfer.'}
-          </div>
+          <p style={{ fontSize: '12px', color: '#ffb703', lineHeight: '1.5' }}>
+            {depositInfo.note || 'Transfer USDT TRC-20 exclusively. Admin verification required.'}
+          </p>
         </div>
 
         {/* Optional Deposit Notice Submission */}
@@ -256,14 +258,14 @@ export function DepositModal({ isOpen, onClose }) {
           )}
 
           <form onSubmit={handleDepositNotice}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '10px', marginBottom: '10px' }}>
+            <div className="responsive-form-grid" style={{ marginBottom: '10px' }}>
               <input
                 type="number"
                 placeholder="Amount (USD)"
                 value={amount}
                 onChange={e => setAmount(e.target.value)}
                 className="input-field"
-                style={{ fontSize: '13px', padding: '8px 12px' }}
+                style={{ fontSize: '13px', padding: '10px 12px' }}
               />
               <input
                 type="text"
@@ -271,7 +273,7 @@ export function DepositModal({ isOpen, onClose }) {
                 value={txHash}
                 onChange={e => setTxHash(e.target.value)}
                 className="input-field"
-                style={{ fontSize: '13px', padding: '8px 12px' }}
+                style={{ fontSize: '13px', padding: '10px 12px' }}
               />
             </div>
             <button

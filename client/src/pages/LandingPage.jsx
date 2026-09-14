@@ -15,9 +15,9 @@ import {
 
 export function LandingPage({ onOpenKyc, onOpenLogin }) {
   return (
-    <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '40px 24px 80px' }}>
+    <div className="landing-container">
       {/* Hero Section */}
-      <section style={{ textAlign: 'center', padding: '60px 0 50px', position: 'relative' }}>
+      <section className="landing-hero">
         <div style={{
           display: 'inline-flex',
           alignItems: 'center',
@@ -35,7 +35,7 @@ export function LandingPage({ onOpenKyc, onOpenLogin }) {
         </div>
 
         <h1 style={{
-          fontSize: 'clamp(36px, 5vw, 58px)',
+          fontSize: 'clamp(28px, 6vw, 56px)',
           fontWeight: 800,
           letterSpacing: '-0.03em',
           lineHeight: '1.15',
@@ -53,27 +53,28 @@ export function LandingPage({ onOpenKyc, onOpenLogin }) {
         </h1>
 
         <p style={{
-          fontSize: 'clamp(16px, 2vw, 19px)',
+          fontSize: 'clamp(15px, 2vw, 18px)',
           color: '#9ca3af',
           maxWidth: '720px',
           margin: '0 auto 36px',
-          lineHeight: '1.6'
+          lineHeight: '1.6',
+          padding: '0 8px'
         }}>
           Welcome to <strong>Trading Trends</strong>. We combine institutional quantitative models with automated weekday yield. Get your KYC verified, receive your personal funded account, and watch your capital expand every Monday to Friday.
         </p>
 
         {/* CTA Buttons */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
+        <div className="landing-cta-row">
           <button
             className="btn btn-primary"
-            style={{ padding: '14px 28px', fontSize: '16px' }}
+            style={{ padding: '14px 28px', fontSize: '15px' }}
             onClick={onOpenKyc}
           >
-            <ShieldCheck size={20} /> Open Account & Submit KYC <ArrowRight size={18} />
+            <ShieldCheck size={18} /> Open Account & Submit KYC <ArrowRight size={16} />
           </button>
           <button
             className="btn btn-secondary"
-            style={{ padding: '14px 28px', fontSize: '16px' }}
+            style={{ padding: '14px 28px', fontSize: '15px' }}
             onClick={onOpenLogin}
           >
             Access Trader Portal
@@ -81,67 +82,62 @@ export function LandingPage({ onOpenKyc, onOpenLogin }) {
         </div>
 
         {/* Live Metrics Strip */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '16px',
-          marginTop: '60px'
-        }}>
-          <div className="glass-panel" style={{ padding: '20px', textAlign: 'center' }}>
-            <div style={{ fontSize: '12px', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '4px' }}>
+        <div className="landing-metrics-grid">
+          <div className="glass-panel" style={{ padding: '18px 14px', textAlign: 'center' }}>
+            <div style={{ fontSize: '11px', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '4px' }}>
               Weekday Target Yield
             </div>
-            <div style={{ fontSize: '28px', fontWeight: 800, color: '#00e676', fontFamily: 'JetBrains Mono' }}>
+            <div style={{ fontSize: 'clamp(22px, 5vw, 28px)', fontWeight: 800, color: '#00e676', fontFamily: 'JetBrains Mono' }}>
               +$50 / Day
             </div>
-            <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>Active Monday to Friday</div>
+            <div style={{ fontSize: '11px', color: '#6b7280', marginTop: '4px' }}>Active Monday to Friday</div>
           </div>
 
-          <div className="glass-panel" style={{ padding: '20px', textAlign: 'center' }}>
-            <div style={{ fontSize: '12px', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '4px' }}>
+          <div className="glass-panel" style={{ padding: '18px 14px', textAlign: 'center' }}>
+            <div style={{ fontSize: '11px', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '4px' }}>
               Minimum Initial Investment
             </div>
-            <div style={{ fontSize: '28px', fontWeight: 800, color: '#00f2fe', fontFamily: 'JetBrains Mono' }}>
+            <div style={{ fontSize: 'clamp(22px, 5vw, 28px)', fontWeight: 800, color: '#00f2fe', fontFamily: 'JetBrains Mono' }}>
               $200 – $500
             </div>
-            <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>Required Deposit to Start (Earn 50 USDT/day)</div>
+            <div style={{ fontSize: '11px', color: '#6b7280', marginTop: '4px' }}>Required Deposit to Start</div>
           </div>
 
-          <div className="glass-panel" style={{ padding: '20px', textAlign: 'center' }}>
-            <div style={{ fontSize: '12px', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '4px' }}>
+          <div className="glass-panel" style={{ padding: '18px 14px', textAlign: 'center' }}>
+            <div style={{ fontSize: '11px', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '4px' }}>
               Weekend Protocol
             </div>
-            <div style={{ fontSize: '28px', fontWeight: 800, color: '#ffb703', fontFamily: 'JetBrains Mono' }}>
+            <div style={{ fontSize: 'clamp(22px, 5vw, 28px)', fontWeight: 800, color: '#ffb703', fontFamily: 'JetBrains Mono' }}>
               100% Shielded
             </div>
-            <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>Paused Sat & Sun (Zero Exposure)</div>
+            <div style={{ fontSize: '11px', color: '#6b7280', marginTop: '4px' }}>Paused Sat & Sun (Zero Exposure)</div>
           </div>
 
-          <div className="glass-panel" style={{ padding: '20px', textAlign: 'center' }}>
-            <div style={{ fontSize: '12px', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '4px' }}>
+          <div className="glass-panel" style={{ padding: '18px 14px', textAlign: 'center' }}>
+            <div style={{ fontSize: '11px', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '4px' }}>
               Withdrawal Settlement
             </div>
-            <div style={{ fontSize: '28px', fontWeight: 800, color: '#ffffff', fontFamily: 'JetBrains Mono' }}>
+            <div style={{ fontSize: 'clamp(20px, 4.5vw, 26px)', fontWeight: 800, color: '#ffffff', fontFamily: 'JetBrains Mono' }}>
               Instant USDT / Binance
             </div>
-            <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>Direct Admin Payout Desk</div>
+            <div style={{ fontSize: '11px', color: '#6b7280', marginTop: '4px' }}>Direct Admin Payout Desk</div>
           </div>
         </div>
       </section>
 
       {/* How It Works Section */}
-      <section style={{ padding: '60px 0' }}>
-        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-          <h2 style={{ fontSize: '32px', fontWeight: 700, color: '#ffffff', marginBottom: '10px' }}>
+      <section style={{ padding: '40px 0' }}>
+        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+          <h2 style={{ fontSize: 'clamp(24px, 5vw, 32px)', fontWeight: 700, color: '#ffffff', marginBottom: '10px' }}>
             How Trading Trends Works
           </h2>
-          <p style={{ color: '#9ca3af', fontSize: '15px' }}>
+          <p style={{ color: '#9ca3af', fontSize: '14px', padding: '0 8px' }}>
             A transparent 4-stage onboarding and quantitative compounding process
           </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '20px' }}>
-          <div className="glass-panel" style={{ padding: '24px' }}>
+        <div className="landing-steps-grid">
+          <div className="glass-panel" style={{ padding: '20px' }}>
             <div style={{
               width: '40px',
               height: '40px',
@@ -156,7 +152,7 @@ export function LandingPage({ onOpenKyc, onOpenLogin }) {
             }}>
               01
             </div>
-            <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#ffffff', marginBottom: '8px' }}>
+            <h3 style={{ fontSize: '17px', fontWeight: 700, color: '#ffffff', marginBottom: '8px' }}>
               KYC Document Submission
             </h3>
             <p style={{ fontSize: '13px', color: '#9ca3af', lineHeight: '1.6' }}>
@@ -164,7 +160,7 @@ export function LandingPage({ onOpenKyc, onOpenLogin }) {
             </p>
           </div>
 
-          <div className="glass-panel" style={{ padding: '24px' }}>
+          <div className="glass-panel" style={{ padding: '20px' }}>
             <div style={{
               width: '40px',
               height: '40px',
@@ -179,7 +175,7 @@ export function LandingPage({ onOpenKyc, onOpenLogin }) {
             }}>
               02
             </div>
-            <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#ffffff', marginBottom: '8px' }}>
+            <h3 style={{ fontSize: '17px', fontWeight: 700, color: '#ffffff', marginBottom: '8px' }}>
               Admin Verification & Initial Deposit
             </h3>
             <p style={{ fontSize: '13px', color: '#9ca3af', lineHeight: '1.6' }}>
@@ -187,7 +183,7 @@ export function LandingPage({ onOpenKyc, onOpenLogin }) {
             </p>
           </div>
 
-          <div className="glass-panel" style={{ padding: '24px' }}>
+          <div className="glass-panel" style={{ padding: '20px' }}>
             <div style={{
               width: '40px',
               height: '40px',
@@ -202,7 +198,7 @@ export function LandingPage({ onOpenKyc, onOpenLogin }) {
             }}>
               03
             </div>
-            <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#ffffff', marginBottom: '8px' }}>
+            <h3 style={{ fontSize: '17px', fontWeight: 700, color: '#ffffff', marginBottom: '8px' }}>
               Mon–Fri Automated Profit
             </h3>
             <p style={{ fontSize: '13px', color: '#9ca3af', lineHeight: '1.6' }}>
@@ -210,7 +206,7 @@ export function LandingPage({ onOpenKyc, onOpenLogin }) {
             </p>
           </div>
 
-          <div className="glass-panel" style={{ padding: '24px' }}>
+          <div className="glass-panel" style={{ padding: '20px' }}>
             <div style={{
               width: '40px',
               height: '40px',
@@ -225,7 +221,7 @@ export function LandingPage({ onOpenKyc, onOpenLogin }) {
             }}>
               04
             </div>
-            <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#ffffff', marginBottom: '8px' }}>
+            <h3 style={{ fontSize: '17px', fontWeight: 700, color: '#ffffff', marginBottom: '8px' }}>
               Withdraw via Crypto or Binance
             </h3>
             <p style={{ fontSize: '13px', color: '#9ca3af', lineHeight: '1.6' }}>
@@ -236,32 +232,28 @@ export function LandingPage({ onOpenKyc, onOpenLogin }) {
       </section>
 
       {/* Feature Showcase */}
-      <section style={{ padding: '40px 0' }}>
-        <div className="glass-panel" style={{
-          padding: '40px',
-          background: 'linear-gradient(135deg, rgba(14, 19, 31, 0.9) 0%, rgba(8, 12, 20, 0.95) 100%)',
-          border: '1px solid rgba(0, 242, 254, 0.2)'
-        }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px', alignItems: 'center' }}>
+      <section style={{ padding: '30px 0' }}>
+        <div className="glass-panel landing-feature-panel">
+          <div className="landing-feature-grid">
             <div>
               <span className="badge badge-cyan" style={{ marginBottom: '12px' }}>
                 Institutional Standards
               </span>
-              <h3 style={{ fontSize: '26px', fontWeight: 700, color: '#ffffff', marginBottom: '16px' }}>
+              <h3 style={{ fontSize: 'clamp(20px, 4.5vw, 26px)', fontWeight: 700, color: '#ffffff', marginBottom: '16px' }}>
                 Full Administrative Oversight & Risk Governance
               </h3>
-              <p style={{ color: '#9ca3af', fontSize: '14px', lineHeight: '1.7', marginBottom: '20px' }}>
+              <p style={{ color: '#9ca3af', fontSize: '13px', lineHeight: '1.7', marginBottom: '20px' }}>
                 Trading Trends is built with total administrative transparency. Every account's wallet performance, daily yield, deposits, and withdrawal requests are supervised in real-time by the compliance portal to guarantee solvency and operational reliability.
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#e5e7eb', fontSize: '14px' }}>
-                  <CheckCircle size={16} color="#00e676" /> Strict Aadhaar & PAN verification before credential issuance
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#e5e7eb', fontSize: '13px' }}>
+                  <CheckCircle size={16} color="#00e676" style={{ flexShrink: 0 }} /> Strict Aadhaar & PAN verification before credential issuance
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#e5e7eb', fontSize: '14px' }}>
-                  <CheckCircle size={16} color="#00e676" /> Guaranteed +$50.00 weekday growth rate (Mon-Fri)
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#e5e7eb', fontSize: '13px' }}>
+                  <CheckCircle size={16} color="#00e676" style={{ flexShrink: 0 }} /> Guaranteed +$50.00 weekday growth rate (Mon-Fri)
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#e5e7eb', fontSize: '14px' }}>
-                  <CheckCircle size={16} color="#00e676" /> Seamless USDT TRC-20 & Binance ID payouts
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#e5e7eb', fontSize: '13px' }}>
+                  <CheckCircle size={16} color="#00e676" style={{ flexShrink: 0 }} /> Seamless USDT TRC-20 & Binance ID payouts
                 </div>
               </div>
             </div>
@@ -269,7 +261,7 @@ export function LandingPage({ onOpenKyc, onOpenLogin }) {
             <div style={{
               background: '#070a12',
               borderRadius: '16px',
-              padding: '24px',
+              padding: '20px',
               border: '1px solid rgba(255, 255, 255, 0.08)'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
@@ -290,8 +282,8 @@ export function LandingPage({ onOpenKyc, onOpenLogin }) {
                   <strong style={{ color: '#00e676' }}>$350.00 USD (+$50)</strong>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', padding: '8px 12px', background: '#0e1422', borderRadius: '8px' }}>
-                  <span style={{ color: '#9ca3af' }}>Weekend (Saturday & Sunday)</span>
-                  <strong style={{ color: '#ffb703' }}>$350.00 USD (Market Paused)</strong>
+                  <span style={{ color: '#9ca3af' }}>Weekend (Sat & Sun)</span>
+                  <strong style={{ color: '#ffb703' }}>$350.00 USD (Paused)</strong>
                 </div>
               </div>
             </div>
@@ -300,16 +292,16 @@ export function LandingPage({ onOpenKyc, onOpenLogin }) {
       </section>
 
       {/* Bottom CTA */}
-      <section style={{ textAlign: 'center', padding: '60px 0 20px' }}>
-        <h2 style={{ fontSize: '30px', fontWeight: 700, color: '#ffffff', marginBottom: '14px' }}>
+      <section style={{ textAlign: 'center', padding: '50px 0 20px' }}>
+        <h2 style={{ fontSize: 'clamp(22px, 5vw, 30px)', fontWeight: 700, color: '#ffffff', marginBottom: '14px' }}>
           Ready to Begin with Trading Trends?
         </h2>
-        <p style={{ color: '#9ca3af', fontSize: '15px', maxWidth: '600px', margin: '0 auto 28px' }}>
+        <p style={{ color: '#9ca3af', fontSize: '14px', maxWidth: '600px', margin: '0 auto 28px', padding: '0 8px' }}>
           Submit your KYC credentials today. Once approved by administration, receive your verified credentials, fund the minimum initial investment ($200–$500 USD), and start earning 50 USDT every weekday.
         </p>
         <button
           className="btn btn-primary"
-          style={{ padding: '14px 32px', fontSize: '16px' }}
+          style={{ padding: '14px 28px', fontSize: '15px' }}
           onClick={onOpenKyc}
         >
           <ShieldCheck size={18} /> Submit KYC Application Now

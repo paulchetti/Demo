@@ -182,7 +182,7 @@ export function KycModal({ isOpen, onClose }) {
               </div>
             )}
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '14px' }}>
+            <div className="responsive-form-grid">
               <div>
                 <label style={{ display: 'block', fontSize: '12px', color: '#9ca3af', marginBottom: '6px' }}>
                   1. Full Legal Name *
@@ -214,7 +214,7 @@ export function KycModal({ isOpen, onClose }) {
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '14px' }}>
+            <div className="responsive-form-grid">
               <div>
                 <label style={{ display: 'block', fontSize: '12px', color: '#9ca3af', marginBottom: '6px' }}>
                   3. Phone Number *
@@ -295,25 +295,24 @@ export function KycModal({ isOpen, onClose }) {
                   border: '1px dashed rgba(255, 255, 255, 0.15)',
                   borderRadius: '8px',
                   padding: '10px 14px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
                   background: 'rgba(255, 255, 255, 0.02)'
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <FileText size={18} color="#00f2fe" />
-                    <span style={{ fontSize: '13px', color: aadharFrontFile ? '#00e676' : '#9ca3af' }}>
+                }} className="responsive-upload-box">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, overflow: 'hidden' }}>
+                    <FileText size={18} color="#00f2fe" style={{ flexShrink: 0 }} />
+                    <span style={{ fontSize: '13px', color: aadharFrontFile ? '#00e676' : '#9ca3af', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {aadharFrontFile ? aadharFrontFile.name : 'No file chosen (Front Side)'}
                     </span>
                   </div>
                   <label style={{
-                    padding: '6px 12px',
+                    padding: '8px 12px',
                     background: 'rgba(0, 242, 254, 0.15)',
                     color: '#00f2fe',
                     borderRadius: '6px',
                     fontSize: '12px',
                     cursor: 'pointer',
-                    fontWeight: 600
+                    fontWeight: 600,
+                    flexShrink: 0,
+                    textAlign: 'center'
                   }}>
                     <Upload size={14} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }} />
                     Browse Front Side
@@ -337,25 +336,24 @@ export function KycModal({ isOpen, onClose }) {
                   border: '1px dashed rgba(255, 255, 255, 0.15)',
                   borderRadius: '8px',
                   padding: '10px 14px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
                   background: 'rgba(255, 255, 255, 0.02)'
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <FileText size={18} color="#00f2fe" />
-                    <span style={{ fontSize: '13px', color: aadharBackFile ? '#00e676' : '#9ca3af' }}>
+                }} className="responsive-upload-box">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, overflow: 'hidden' }}>
+                    <FileText size={18} color="#00f2fe" style={{ flexShrink: 0 }} />
+                    <span style={{ fontSize: '13px', color: aadharBackFile ? '#00e676' : '#9ca3af', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {aadharBackFile ? aadharBackFile.name : 'No file chosen (Back Side)'}
                     </span>
                   </div>
                   <label style={{
-                    padding: '6px 12px',
+                    padding: '8px 12px',
                     background: 'rgba(0, 242, 254, 0.15)',
                     color: '#00f2fe',
                     borderRadius: '6px',
                     fontSize: '12px',
                     cursor: 'pointer',
-                    fontWeight: 600
+                    fontWeight: 600,
+                    flexShrink: 0,
+                    textAlign: 'center'
                   }}>
                     <Upload size={14} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }} />
                     Browse Back Side
@@ -398,25 +396,24 @@ export function KycModal({ isOpen, onClose }) {
                 border: '1px dashed rgba(255, 255, 255, 0.15)',
                 borderRadius: '8px',
                 padding: '10px 14px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
                 background: 'rgba(255, 255, 255, 0.02)'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <FileText size={18} color="#00e676" />
-                  <span style={{ fontSize: '13px', color: panFile ? '#00e676' : '#9ca3af' }}>
+              }} className="responsive-upload-box">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, overflow: 'hidden' }}>
+                  <FileText size={18} color="#00e676" style={{ flexShrink: 0 }} />
+                  <span style={{ fontSize: '13px', color: panFile ? '#00e676' : '#9ca3af', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {panFile ? panFile.name : 'No PAN file chosen'}
                   </span>
                 </div>
                 <label style={{
-                  padding: '6px 12px',
+                  padding: '8px 12px',
                   background: 'rgba(0, 230, 118, 0.15)',
                   color: '#00e676',
                   borderRadius: '6px',
                   fontSize: '12px',
                   cursor: 'pointer',
-                  fontWeight: 600
+                  fontWeight: 600,
+                  flexShrink: 0,
+                  textAlign: 'center'
                 }}>
                   <Upload size={14} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }} />
                   Browse File

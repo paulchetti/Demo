@@ -35,14 +35,14 @@ export function TradingViewWidget() {
   }, [activeSymbol]);
 
   return (
-    <div className="glass-panel" style={{ padding: '18px', marginBottom: '24px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+    <div className="glass-panel" style={{ padding: '16px', marginBottom: '24px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <BarChart2 size={18} color="#00f2fe" />
           <h4 style={{ fontSize: '15px', fontWeight: 700, color: '#ffffff' }}>Live Market Terminal</h4>
         </div>
 
-        <div style={{ display: 'flex', gap: '6px' }}>
+        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
           {[
             { label: 'BTC/USDT', symbol: 'BINANCE:BTCUSDT' },
             { label: 'ETH/USDT', symbol: 'BINANCE:ETHUSDT' },
@@ -52,7 +52,7 @@ export function TradingViewWidget() {
               key={item.symbol}
               onClick={() => setActiveSymbol(item.symbol)}
               style={{
-                padding: '4px 10px',
+                padding: '5px 10px',
                 borderRadius: '6px',
                 border: activeSymbol === item.symbol ? '1px solid #00f2fe' : '1px solid rgba(255, 255, 255, 0.08)',
                 background: activeSymbol === item.symbol ? 'rgba(0, 242, 254, 0.15)' : 'transparent',
@@ -69,9 +69,8 @@ export function TradingViewWidget() {
       </div>
 
       <div
-        className="tradingview-widget-container"
+        className="tradingview-chart-box"
         ref={containerRef}
-        style={{ height: '360px', width: '100%', borderRadius: '12px', overflow: 'hidden' }}
       >
         <div className="tradingview-widget-container__widget" style={{ height: '100%', width: '100%' }}></div>
       </div>

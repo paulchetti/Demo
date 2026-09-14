@@ -238,7 +238,7 @@ export function WithdrawModal({ isOpen, onClose }) {
               <label style={{ display: 'block', fontSize: '12px', color: '#9ca3af', marginBottom: '6px' }}>
                 Payout Destination Method *
               </label>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '10px' }}>
                 <button
                   type="button"
                   onClick={() => setDestinationType('CRYPTO')}
