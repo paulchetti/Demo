@@ -1,0 +1,11 @@
+{
+  "name": "trading-trends",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Trading Trends algorithmic trading and platform",
+  "scripts": {
+    "build": "npm --prefix client run build",
+    "client": "npm --prefix client run dev",
+    "server": "node server/index.js"
+  }
+}
