@@ -146,7 +146,7 @@ export function AdminDashboard() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to create user');
 
-      alert(`User ${newUserForm.username} created successfully! Initial Balance: $${newUserForm.initialBalance} USD`);
+      alert(`User ${newUserForm.username} created successfully! Recent Deposited Capital: $${newUserForm.initialBalance} USD`);
       setCreateUserModalOpen(false);
       // Reset form
       setNewUserForm({
@@ -556,7 +556,7 @@ export function AdminDashboard() {
                 <tr style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)', color: '#9ca3af' }}>
                   <th style={{ padding: '12px 10px' }}>User Details</th>
                   <th style={{ padding: '12px 10px' }}>Current Balance</th>
-                  <th style={{ padding: '12px 10px' }}>Initial Deposit ($200+ Min)</th>
+                  <th style={{ padding: '12px 10px' }}>Recent Deposited Capital ($200+ Min)</th>
                   <th style={{ padding: '12px 10px' }}>Daily Rate (% / Mon-Fri)</th>
                   <th style={{ padding: '12px 10px' }}>KYC Aadhaar & PAN</th>
                   <th style={{ padding: '12px 10px' }}>Status</th>
@@ -1461,7 +1461,7 @@ export function AdminDashboard() {
                 <div className="responsive-form-grid" style={{ gap: '14px' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '12px', color: '#ffffff', marginBottom: '4px' }}>
-                      Initial Deposited Capital (USD) *
+                      Recent Deposited Capital (USD) *
                     </label>
                     <input
                       type="number"
@@ -1769,7 +1769,7 @@ export function AdminDashboard() {
                 marginBottom: '16px'
               }}>
                 <div style={{ background: '#0e1422', border: '1px solid rgba(255, 255, 255, 0.05)', borderRadius: '10px', padding: '12px' }}>
-                  <div style={{ fontSize: '11px', color: '#9ca3af' }}>Current Initial Balance</div>
+                  <div style={{ fontSize: '11px', color: '#9ca3af' }}>Recent Deposited Capital</div>
                   <div style={{ fontSize: '16px', fontWeight: 700, color: '#ffd700', fontFamily: 'JetBrains Mono' }}>
                     ${depositToApprove.initialBal.toFixed(2)} USD
                   </div>
@@ -1803,7 +1803,7 @@ export function AdminDashboard() {
                       cursor: 'pointer'
                     }}
                   >
-                    <div style={{ fontSize: '11px', color: '#9ca3af' }}>Add to Initial Deposit</div>
+                    <div style={{ fontSize: '11px', color: '#9ca3af' }}>Add to Recent Deposited Capital</div>
                     <div style={{ fontSize: '14px', fontWeight: 700, color: '#00f2fe', fontFamily: 'JetBrains Mono' }}>
                       ${(depositToApprove.initialBal + depositToApprove.depositAmt).toFixed(2)} USD
                     </div>

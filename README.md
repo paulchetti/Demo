@@ -8,7 +8,7 @@
 
 ### 1. Visitor Landing Page
 - Institutional dark theme with vibrant cyan (`#00f2fe`) and emerald (`#00e676`) accents.
-- Educational onboarding workflow explaining the **$200+ USD minimum initial investment deposit (no upper limit)** required to activate daily 3% compounding gains.
+- Educational onboarding workflow explaining the **$200+ USD minimum recent deposit (no upper limit)** required to activate daily 3% compounding gains.
 - Live market ticker and quantitative performance stats.
 
 ### 2. KYC Verification & Email Dispatch

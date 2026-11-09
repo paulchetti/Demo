@@ -270,7 +270,7 @@ export function LandingPage({ onOpenKyc, onOpenLogin }) {
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', padding: '8px 12px', background: '#0e1422', borderRadius: '8px' }}>
-                  <span style={{ color: '#9ca3af' }}>Initial Investment Deposit</span>
+                  <span style={{ color: '#9ca3af' }}>Recent Deposited Capital</span>
                   <strong style={{ color: '#ffffff' }}>$200.00 USD</strong>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', padding: '8px 12px', background: '#0e1422', borderRadius: '8px' }}>

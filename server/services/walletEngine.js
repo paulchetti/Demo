@@ -36,7 +36,7 @@ export function calculateUserWallet(user, approvedWithdrawalsTotal = 0) {
     isWeekend: isWeekend(currentDate.getUTCDay()),
     growthAmount: 0,
     balance: Math.round(runningBalance * 100) / 100,
-    note: 'Initial Account Deposit'
+    note: 'Recent Deposited Capital'
   });
 
   // Step through each day up to today

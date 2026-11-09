@@ -115,7 +115,7 @@ export async function sendCredentialsEmail({ toEmail, username, password, fullNa
       <div style="background-color: #161b22; padding: 18px; border-radius: 6px; border: 1px solid #30363d; margin: 16px 0;">
         <p style="margin: 4px 0;"><strong>Username:</strong> <code style="color: #58a6ff; font-size: 15px;">${username}</code></p>
         <p style="margin: 4px 0;"><strong>Temporary Password:</strong> <code style="color: #00e676; font-size: 15px;">${password}</code></p>
-        <p style="margin: 4px 0;"><strong>Initial Deposited Capital:</strong> <span style="color: #ffd700; font-weight: bold;">$${initialBalance} USD</span></p>
+        <p style="margin: 4px 0;"><strong>Recent Deposited Capital:</strong> <span style="color: #ffd700; font-weight: bold;">$${initialBalance} USD</span></p>
         <p style="margin: 4px 0;"><strong>Daily Algorithmic Yield:</strong> <span style="color: #00e676;">+3% compounding growth / weekday (Mon-Fri)</span></p>
       </div>
 

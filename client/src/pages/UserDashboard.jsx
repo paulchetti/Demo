@@ -241,7 +241,7 @@ export function UserDashboard() {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', padding: '8px 12px', background: '#090d16', borderRadius: '8px' }}>
-                <span style={{ color: '#9ca3af' }}>Initial Deposited Capital:</span>
+                <span style={{ color: '#9ca3af' }}>Recent Deposited Capital:</span>
                 <strong style={{ color: '#ffffff' }}>${(wallet?.initialBalance || 0).toFixed(2)} USD</strong>
               </div>
 
