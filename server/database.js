@@ -132,6 +132,9 @@ function readLocalDb() {
     }
     const raw = fs.readFileSync(DB_FILE, 'utf-8');
     const parsed = JSON.parse(raw);
+    if (!parsed.users || !Array.isArray(parsed.users)) parsed.users = [];
+    if (!parsed.transactions || !Array.isArray(parsed.transactions)) parsed.transactions = [];
+    if (!parsed.kycSubmissions || !Array.isArray(parsed.kycSubmissions)) parsed.kycSubmissions = [];
     if (!parsed.botTrades || !Array.isArray(parsed.botTrades)) parsed.botTrades = [...DEFAULT_BOT_TRADES];
     if (!parsed.botConfig) parsed.botConfig = { ...DEFAULT_BOT_CONFIG };
     if (!parsed.supportMessages || !Array.isArray(parsed.supportMessages)) parsed.supportMessages = [];
@@ -152,11 +155,19 @@ function readLocalDb() {
 
 function writeLocalDb(data) {
   try {
-    const tmpFile = `${DB_FILE}.tmp`;
-    fs.writeFileSync(tmpFile, JSON.stringify(data, null, 2), 'utf-8');
-    fs.renameSync(tmpFile, DB_FILE);
+    const jsonStr = JSON.stringify(data, null, 2);
+    // Write directly to DB_FILE to prevent Windows/OneDrive renameSync lock issues
+    fs.writeFileSync(DB_FILE, jsonStr, 'utf-8');
   } catch (err) {
-    console.error('Error writing database file:', err);
+    console.error('Direct write to store.json failed, attempting fallback write:', err.message);
+    try {
+      const tmpFile = `${DB_FILE}.tmp`;
+      fs.writeFileSync(tmpFile, JSON.stringify(data, null, 2), 'utf-8');
+      fs.copyFileSync(tmpFile, DB_FILE);
+      try { fs.unlinkSync(tmpFile); } catch (_) {}
+    } catch (fallbackErr) {
+      console.error('Fatal error writing store.json:', fallbackErr.message);
+    }
   }
 }
 
@@ -192,8 +203,12 @@ export function getUserById(id) {
 
 export function getUserByEmailOrUsername(identifier) {
   const db = readDb();
-  const lower = identifier.toLowerCase().trim();
-  return db.users.find(u => u.email.toLowerCase() === lower || u.username.toLowerCase() === lower);
+  if (!identifier) return null;
+  const lower = String(identifier).toLowerCase().trim();
+  return db.users.find(u =>
+    (u.email && String(u.email).toLowerCase().trim() === lower) ||
+    (u.username && String(u.username).toLowerCase().trim() === lower)
+  );
 }
 
 export function createUser(userData) {
@@ -232,9 +247,11 @@ export function updateUser(id, updates) {
   const idx = db.users.findIndex(u => u.id === id);
   if (idx === -1) return null;
 
-  if (updates.password) {
+  if (updates.password && updates.password.trim()) {
     const salt = bcrypt.genSaltSync(10);
-    updates.passwordHash = bcrypt.hashSync(updates.password, salt);
+    updates.passwordHash = bcrypt.hashSync(updates.password.trim(), salt);
+    delete updates.password;
+  } else {
     delete updates.password;
   }
 

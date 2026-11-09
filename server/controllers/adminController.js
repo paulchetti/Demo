@@ -1,6 +1,7 @@
 import {
   getAllUsers,
   getUserById,
+  getUserByEmailOrUsername,
   createUser,
   updateUser,
   deleteUser,
@@ -62,9 +63,20 @@ export async function createNewUser(req, res) {
       return res.status(400).json({ error: 'Username, email, and password are required' });
     }
 
+    const cleanUsername = username.trim();
+    const cleanEmail = email.trim().toLowerCase();
+
+    // Prevent duplicate username or email collisions
+    const existingUser = getUserByEmailOrUsername(cleanUsername) || getUserByEmailOrUsername(cleanEmail);
+    if (existingUser) {
+      return res.status(400).json({
+        error: `A user account with username "${cleanUsername}" or email "${cleanEmail}" already exists. Please choose a unique username/email.`
+      });
+    }
+
     const newUser = createUser({
-      username: username.trim(),
-      email: email.trim().toLowerCase(),
+      username: cleanUsername,
+      email: cleanEmail,
       password: password.trim(),
       role: 'USER',
       fullName: fullName || username,
