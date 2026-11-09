@@ -93,14 +93,13 @@ export function LandingPage({ onOpenKyc, onOpenLogin }) {
             <div style={{ fontSize: '11px', color: '#6b7280', marginTop: '4px' }}>Active Monday to Friday</div>
           </div>
 
-          <div className="glass-panel" style={{ padding: '18px 14px', textAlign: 'center' }}>
+          <div className="glass-panel" style={{ padding: '18px 14px', textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <div style={{ fontSize: '11px', color: '#9ca3af', textTransform: 'uppercase', marginBottom: '4px' }}>
               Minimum Initial Investment
             </div>
             <div style={{ fontSize: 'clamp(22px, 5vw, 28px)', fontWeight: 800, color: '#00f2fe', fontFamily: 'JetBrains Mono' }}>
               $200+
             </div>
-            <div style={{ fontSize: '11px', color: '#6b7280', marginTop: '4px' }}>Required Deposit (No Upper Limit)</div>
           </div>
 
           <div className="glass-panel" style={{ padding: '18px 14px', textAlign: 'center' }}>

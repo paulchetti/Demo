@@ -483,6 +483,28 @@
       "readByAdmin": true,
       "readByUser": true,
       "createdAt": "2026-11-09T14:56:42.707Z"
+    },
+    {
+      "id": "msg-1794236624602-dhokw",
+      "userId": "test-user-1794236624522",
+      "userName": "New Trader",
+      "userEmail": "",
+      "sender": "USER",
+      "text": "Hello there, testing bot response",
+      "readByAdmin": true,
+      "readByUser": true,
+      "createdAt": "2026-11-09T15:03:44.602Z"
+    },
+    {
+      "id": "msg-1794236624606-28ugw",
+      "userId": "test-user-1794236624522",
+      "userName": "Customer Support",
+      "userEmail": "support@tradingtrends.com",
+      "sender": "BOT",
+      "text": "Hello New Trader! Your message has been received by Customer Support. A support representative will reply to you right here shortly.",
+      "readByAdmin": true,
+      "readByUser": false,
+      "createdAt": "2026-11-09T15:03:44.606Z"
     }
   ]
 }
