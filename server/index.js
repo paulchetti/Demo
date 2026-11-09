@@ -33,7 +33,15 @@ import {
   markAdminThreadRead
 } from './controllers/supportController.js';
 import { authenticateToken, optionalAuthenticateToken, requireAdmin } from './middleware/auth.js';
-import { getBotData, createBotTrade, deleteBotTrade, updateBotConfig, initDatabase, getSettings } from './database.js';
+import {
+  getBotData,
+  createBotTrade,
+  deleteBotTrade,
+  updateBotConfig,
+  initDatabase,
+  getSettings,
+  getDatabaseStatus
+} from './database.js';
 
 dotenv.config();
 
@@ -55,11 +63,13 @@ app.use(express.urlencoded({ extended: true }));
 // Serve uploaded KYC files (restricted in production or used for attachment preview)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Health check
+// Health check with real-time Database Diagnostics
 app.get('/api/health', (req, res) => {
+  const dbStatus = getDatabaseStatus();
   res.json({
     status: 'online',
     platform: 'Trading Trends API Engine',
+    database: dbStatus,
     timestamp: new Date().toISOString()
   });
 });

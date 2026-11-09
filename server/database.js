@@ -17,6 +17,7 @@ if (!fs.existsSync(DATA_DIR)) {
 let memoryStore = null;
 let mongoClient = null;
 let mongoCollection = null;
+let mongoLastError = null;
 
 const DEFAULT_SETTINGS = {
   depositUsdtAddress: 'TXyZ889KqN7W8B29LkJ5Q81HkMvPqS4eRt',
@@ -66,6 +67,7 @@ export async function initDatabase() {
     const db = mongoClient.db('TradingTrends');
     mongoCollection = db.collection('app_store');
     console.log('✅ Connected to MongoDB Atlas successfully!');
+    mongoLastError = null;
 
     const cloudData = await mongoCollection.findOne({ _id: 'main_store' });
     if (cloudData) {
@@ -90,6 +92,7 @@ export async function initDatabase() {
       console.log(`✅ Seeded MongoDB Atlas with initial data (${memoryStore.users.length} users) from store.json!`);
     }
   } catch (err) {
+    mongoLastError = err;
     console.error('⚠️ MongoDB connection error (using local store.json fallback):', err.message);
   }
 }
@@ -186,8 +189,24 @@ function writeDb(data) {
       { _id: 'main_store' },
       { $set: data },
       { upsert: true }
-    ).catch(err => console.error('MongoDB cloud sync error:', err.message));
+    ).then(() => {
+      console.log(`☁️ Synced to MongoDB Atlas cloud successfully (${data.users?.length} users, ${data.transactions?.length} transactions).`);
+    }).catch(err => {
+      console.error('MongoDB cloud sync error:', err.message);
+      mongoLastError = err;
+    });
   }
+}
+
+export function getDatabaseStatus() {
+  return {
+    databaseMode: mongoCollection ? 'MONGODB_ATLAS' : (process.env.MONGODB_URI ? 'FALLBACK_LOCAL_DUE_TO_ERROR' : 'LOCAL_JSON'),
+    connected: !!mongoCollection,
+    mongoUriConfigured: !!process.env.MONGODB_URI,
+    lastMongoError: mongoLastError ? mongoLastError.message : null,
+    totalUsers: (memoryStore?.users || []).length,
+    timestamp: new Date().toISOString()
+  };
 }
 
 // User Helpers
