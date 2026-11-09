@@ -92,6 +92,7 @@ You can deploy the platform 100% free with automated SSL domains:
    - `ADMIN_EMAIL` = `tradingtrendsbeta@gmail.com`
    - `JWT_SECRET` = `trading_trends_secure_secret_2026` (or any random string)
    - `NODE_ENV` = `production`
+   - `MONGODB_URI` = `mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/?retryWrites=true&w=majority` (Optional: provides permanent 24/7 cloud persistence on Render Free Tier)
 6. Click **Deploy Web Service**.
 7. Once deployed, copy your backend URL (e.g., `https://trading-trends-api.onrender.com`).
 
