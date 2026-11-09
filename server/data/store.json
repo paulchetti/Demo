@@ -31,14 +31,14 @@
       "address": "402 Skyline Towers, Bandra West, Mumbai",
       "aadharNo": "9823 4512 8765",
       "panNo": "ABCPS1234F",
-      "initialBalance": 800,
+      "initialBalance": 1050,
       "dailyGrowthRate": 3,
-      "growthStartDate": "2026-11-09T13:53:24.309Z",
+      "growthStartDate": "2026-11-09T14:00:37.820Z",
       "manualAdjustment": 0,
       "status": "ACTIVE",
       "createdAt": "2026-09-14T07:01:13.653Z",
       "password": "",
-      "updatedAt": "2026-11-09T13:53:24.309Z"
+      "updatedAt": "2026-11-09T14:00:37.820Z"
     },
     {
       "id": "user-1789371582036-m1crw",
@@ -62,6 +62,37 @@
     }
   ],
   "transactions": [
+    {
+      "id": "tx-1794232774106-9r4g0",
+      "userId": "user-1789369273510-cn7tm",
+      "userName": "Rahul Sharma",
+      "userEmail": "rahul@example.com",
+      "type": "DEPOSIT",
+      "amount": 250,
+      "cryptoAddress": "",
+      "network": "USDT (TRC-20)",
+      "binanceId": "",
+      "txHash": "",
+      "status": "APPROVED",
+      "note": "Deposit of $250.00 USD verified and credited.",
+      "createdAt": "2026-11-09T13:59:34.106Z",
+      "updatedAt": "2026-11-09T14:00:37.824Z"
+    },
+    {
+      "id": "tx-1794232595770-4gbbk",
+      "userId": "admin-001",
+      "userName": "System Administrator",
+      "userEmail": "admin@tradingtrends.com",
+      "type": "DEPOSIT",
+      "amount": 200,
+      "cryptoAddress": "",
+      "network": "USDT (TRC-20)",
+      "binanceId": "",
+      "txHash": "",
+      "status": "REJECTED",
+      "createdAt": "2026-11-09T13:56:35.770Z",
+      "updatedAt": "2026-11-09T13:57:27.091Z"
+    },
     {
       "id": "tx-1794232404199-ilxjd",
       "userId": "user-1789369273510-cn7tm",
@@ -137,21 +168,6 @@
       "status": "APPROVED",
       "createdAt": "2026-09-14T07:12:36.901Z",
       "updatedAt": "2026-09-14T08:00:59.197Z"
-    },
-    {
-      "id": "tx-1789369273884-4hyfq",
-      "userId": "user-1789369273510-cn7tm",
-      "userName": "Rahul Sharma",
-      "userEmail": "rahul@example.com",
-      "type": "WITHDRAWAL",
-      "amount": 50,
-      "cryptoAddress": "TXyZ889KqN7W8B29LkJ5Q81HkMvPqS4eRt",
-      "network": "USDT (TRC-20)",
-      "binanceId": "",
-      "txHash": "",
-      "status": "APPROVED",
-      "createdAt": "2026-09-14T07:01:13.884Z",
-      "updatedAt": "2026-09-14T07:01:13.921Z"
     }
   ],
   "kycSubmissions": [

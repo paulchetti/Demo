@@ -29,8 +29,9 @@ export async function login(req, res) {
 
     // Calculate live wallet metrics
     const userTxs = getTransactionsByUserId(user.id);
+    const growthStart = user.growthStartDate ? new Date(user.growthStartDate).getTime() : 0;
     const approvedWithdrawals = userTxs
-      .filter(t => t.type === 'WITHDRAWAL' && t.status === 'APPROVED')
+      .filter(t => t.type === 'WITHDRAWAL' && t.status === 'APPROVED' && new Date(t.createdAt).getTime() >= growthStart)
       .reduce((sum, t) => sum + Number(t.amount), 0);
 
     const wallet = calculateUserWallet(user, approvedWithdrawals);
@@ -58,8 +59,9 @@ export async function getCurrentUser(req, res) {
     }
 
     const userTxs = getTransactionsByUserId(user.id);
+    const growthStart = user.growthStartDate ? new Date(user.growthStartDate).getTime() : 0;
     const approvedWithdrawals = userTxs
-      .filter(t => t.type === 'WITHDRAWAL' && t.status === 'APPROVED')
+      .filter(t => t.type === 'WITHDRAWAL' && t.status === 'APPROVED' && new Date(t.createdAt).getTime() >= growthStart)
       .reduce((sum, t) => sum + Number(t.amount), 0);
 
     const wallet = calculateUserWallet(user, approvedWithdrawals);

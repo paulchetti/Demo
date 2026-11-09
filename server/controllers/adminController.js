@@ -20,8 +20,9 @@ export async function listAllUsers(req, res) {
 
     const usersWithWallets = allUsers.map(u => {
       const userTxs = allTxs.filter(t => t.userId === u.id);
+      const growthStart = u.growthStartDate ? new Date(u.growthStartDate).getTime() : 0;
       const approvedWithdrawals = userTxs
-        .filter(t => t.type === 'WITHDRAWAL' && t.status === 'APPROVED')
+        .filter(t => t.type === 'WITHDRAWAL' && t.status === 'APPROVED' && new Date(t.createdAt).getTime() >= growthStart)
         .reduce((sum, t) => sum + Number(t.amount), 0);
 
       const wallet = calculateUserWallet(u, approvedWithdrawals);
@@ -134,8 +135,9 @@ export async function editUser(req, res) {
     delete safeUser.passwordHash;
 
     const userTxs = getTransactionsByUserId(id);
+    const growthStart = updated.growthStartDate ? new Date(updated.growthStartDate).getTime() : 0;
     const approvedWithdrawals = userTxs
-      .filter(t => t.type === 'WITHDRAWAL' && t.status === 'APPROVED')
+      .filter(t => t.type === 'WITHDRAWAL' && t.status === 'APPROVED' && new Date(t.createdAt).getTime() >= growthStart)
       .reduce((sum, t) => sum + Number(t.amount), 0);
     const wallet = calculateUserWallet(updated, approvedWithdrawals);
 
@@ -202,8 +204,9 @@ export async function inspectUserDashboard(req, res) {
     if (!user) return res.status(404).json({ error: 'User not found' });
 
     const userTxs = getTransactionsByUserId(id);
+    const growthStart = updated.growthStartDate ? new Date(updated.growthStartDate).getTime() : 0;
     const approvedWithdrawals = userTxs
-      .filter(t => t.type === 'WITHDRAWAL' && t.status === 'APPROVED')
+      .filter(t => t.type === 'WITHDRAWAL' && t.status === 'APPROVED' && new Date(t.createdAt).getTime() >= growthStart)
       .reduce((sum, t) => sum + Number(t.amount), 0);
     const wallet = calculateUserWallet(user, approvedWithdrawals);
 
