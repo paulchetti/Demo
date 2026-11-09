@@ -202,3 +202,65 @@ export async function sendWithdrawalRequestEmail({ user, amount, cryptoAddress, 
 
   return { success: true, sent: false };
 }
+
+export async function sendSupportInquiryEmail({ userName, userEmail, text, userId }) {
+  const settings = getSettings();
+  const recipient = process.env.ADMIN_EMAIL || settings.adminEmail || 'admin@tradingtrends.com';
+  const transporter = createTransporter();
+
+  const subject = `[SUPPORT CHATBOT INQUIRY] New Message from ${userName}`;
+  const html = `
+    <div style="font-family: Arial, sans-serif; background-color: #0d1117; color: #c9d1d9; padding: 24px; border-radius: 8px;">
+      <h2 style="color: #00f2fe; border-bottom: 2px solid #00f2fe; padding-bottom: 8px;">New Support Inquiry Received</h2>
+      <p style="font-size: 14px; color: #8b949e;">A user has sent a message via the <strong>Trading Trends Live Support Chatbot</strong>.</p>
+      
+      <table style="width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 14px;">
+        <tr style="border-bottom: 1px solid #30363d;">
+          <td style="padding: 10px; color: #8b949e; width: 30%;">User:</td>
+          <td style="padding: 10px; font-weight: bold; color: #ffffff;">${userName}</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #30363d;">
+          <td style="padding: 10px; color: #8b949e;">Email:</td>
+          <td style="padding: 10px; color: #58a6ff;">${userEmail || 'Guest / Unauthenticated'}</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #30363d;">
+          <td style="padding: 10px; color: #8b949e;">User ID:</td>
+          <td style="padding: 10px; color: #8b949e; font-family: monospace;">${userId}</td>
+        </tr>
+      </table>
+
+      <div style="margin-top: 20px; padding: 16px; background-color: #161b22; border-left: 4px solid #00f2fe; border-radius: 4px;">
+        <h4 style="margin: 0 0 8px 0; color: #00f2fe;">Message Content:</h4>
+        <p style="margin: 0; font-size: 14px; color: #ffffff; line-height: 1.5; white-space: pre-wrap;">${text}</p>
+      </div>
+
+      <div style="margin-top: 20px;">
+        <p style="font-size: 13px; color: #8b949e;">Open your Admin Portal Support Desk to reply directly in real time.</p>
+      </div>
+    </div>
+  `;
+
+  console.log(`\n======================================================`);
+  console.log(`[SUPPORT CHATBOT DISPATCH] => To Admin: ${recipient}`);
+  console.log(`[USER] ${userName} (${userEmail || 'Guest'}) | ID: ${userId}`);
+  console.log(`[MESSAGE] "${text}"`);
+  console.log(`======================================================\n`);
+
+  if (transporter) {
+    try {
+      await transporter.sendMail({
+        from: settings.smtpSender || '"Trading Trends" <no-reply@tradingtrends.com>',
+        to: recipient,
+        subject,
+        html
+      });
+      return { success: true, sent: true };
+    } catch (err) {
+      console.error('SMTP Delivery error:', err.message);
+      return { success: true, sent: false, error: err.message };
+    }
+  }
+
+  return { success: true, sent: false };
+}
+

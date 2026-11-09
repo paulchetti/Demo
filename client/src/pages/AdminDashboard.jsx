@@ -1931,11 +1931,11 @@ export function AdminDashboard() {
                             >
                               {isAdmin ? (
                                 <>
-                                  <Shield size={12} /> You (Admin Desk)
+                                  <Shield size={12} /> You (Customer Support)
                                 </>
                               ) : isBot ? (
                                 <>
-                                  <Bot size={12} /> Automated System Bot
+                                  <Bot size={12} /> Customer Support Bot
                                 </>
                               ) : (
                                 <>

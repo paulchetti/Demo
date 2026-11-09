@@ -403,31 +403,86 @@
       "userEmail": "rahul@example.com",
       "sender": "USER",
       "text": "Hello admin, I just submitted my deposit of $300. Could you please check and verify it?",
-      "readByAdmin": false,
+      "readByAdmin": true,
       "readByUser": true,
       "createdAt": "2026-11-09T14:46:47.608Z"
     },
     {
       "id": "msg-1794235607612-vwlod",
       "userId": "user-1789369273510-cn7tm",
-      "userName": "Trading Trends Support Bot",
+      "userName": "Customer Support",
       "userEmail": "support@tradingtrends.com",
       "sender": "BOT",
-      "text": "Hello Rahul Sharma! Your message has been routed to our Institutional Support Desk. An administrator has been notified and will reply here shortly.",
-      "readByAdmin": false,
+      "text": "Hello Rahul Sharma! Your message has been received by Customer Support. A support representative will reply to you right here shortly.",
+      "readByAdmin": true,
       "readByUser": true,
       "createdAt": "2026-11-09T14:46:47.612Z"
     },
     {
       "id": "msg-1794235607762-wektq",
       "userId": "user-1789369273510-cn7tm",
-      "userName": "Admin Support Desk",
+      "userName": "Customer Support",
       "userEmail": "support@tradingtrends.com",
       "sender": "ADMIN",
       "text": "Hi Rahul, we have received your deposit notification of $300 USDT. Your account balance has been updated and 3% compounding is active!",
       "readByAdmin": true,
       "readByUser": true,
       "createdAt": "2026-11-09T14:46:47.762Z"
+    },
+    {
+      "id": "msg-1794235818562-vyynd",
+      "userId": "user-1789369273510-cn7tm",
+      "userName": "Rahul Sharma",
+      "userEmail": "rahul@example.com",
+      "sender": "USER",
+      "text": "hi admin sir how are you",
+      "readByAdmin": true,
+      "readByUser": true,
+      "createdAt": "2026-11-09T14:50:18.562Z"
+    },
+    {
+      "id": "msg-1794235867891-1edon",
+      "userId": "user-1789369273510-cn7tm",
+      "userName": "Admin Support Desk",
+      "userEmail": "support@tradingtrends.com",
+      "sender": "ADMIN",
+      "text": "hi rahul i'm fine and wah about ypu",
+      "readByAdmin": true,
+      "readByUser": true,
+      "createdAt": "2026-11-09T14:51:07.891Z"
+    },
+    {
+      "id": "msg-1794235922293-5r1qs",
+      "userId": "guest-1794235310840-tkabf",
+      "userName": "Guest Trader",
+      "userEmail": "",
+      "sender": "USER",
+      "text": "hi",
+      "readByAdmin": true,
+      "readByUser": true,
+      "createdAt": "2026-11-09T14:52:02.293Z"
+    },
+    {
+      "id": "msg-1794235922299-knppu",
+      "userId": "guest-1794235310840-tkabf",
+      "userName": "Customer Support",
+      "userEmail": "support@tradingtrends.com",
+      "sender": "BOT",
+      "text": "Hello Guest Trader! Your message has been received by Customer Support. A support representative will reply to you right here shortly.",
+      "readByAdmin": true,
+      "readByUser": true,
+      "createdAt": "2026-11-09T14:52:02.299Z"
+    },
+    {
+      "id": "msg-1794236202707-spymv",
+      "userId": "guest-1794235310840-tkabf",
+      "userName": "Guest Trader",
+      "userEmail": "",
+      "sender": "USER",
+      "text": "what is this website about",
+      "readByAdmin": true,
+      "readByUser": true,
+      "createdAt": "2026-11-09T14:56:42.707Z"
     }
   ]
 }

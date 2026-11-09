@@ -61,10 +61,10 @@ export function sendUserMessage(req, res) {
     if (isFirstMessage) {
       botGreeting = addSupportMessage({
         userId,
-        userName: 'Trading Trends Support Bot',
+        userName: 'Customer Support',
         userEmail: 'support@tradingtrends.com',
         sender: 'BOT',
-        text: `Hello ${userName}! Your message has been routed to our Institutional Support Desk. An administrator has been notified and will reply here shortly.`
+        text: `Hello ${userName}! Your message has been received by Customer Support. A support representative will reply to you right here shortly.`
       });
     }
 
@@ -165,7 +165,7 @@ export function sendAdminReply(req, res) {
 
     const reply = addSupportMessage({
       userId,
-      userName: 'Admin Support Desk',
+      userName: 'Customer Support',
       userEmail: 'support@tradingtrends.com',
       sender: 'ADMIN',
       text: text.trim()
@@ -193,3 +193,4 @@ export function markAdminThreadRead(req, res) {
     res.status(500).json({ error: 'Failed to mark thread as read: ' + err.message });
   }
 }
+

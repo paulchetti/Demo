@@ -170,7 +170,7 @@ export function SupportChat() {
             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             transform: isOpen ? 'rotate(90deg)' : 'scale(1)'
           }}
-          title={isOpen ? 'Close Live Support' : 'Open Support Chatbot & Admin Desk'}
+          title={isOpen ? 'Close Customer Support' : 'Open Customer Support Chat'}
         >
           {isOpen ? <X size={26} /> : <Bot size={28} />}
 
@@ -280,7 +280,7 @@ export function SupportChat() {
                   />
                 </div>
                 <span style={{ fontSize: '11px', color: '#9ca3af' }}>
-                  Institutional Bot & Admin Desk • Live
+                  Customer Support • Live
                 </span>
               </div>
             </div>
@@ -360,7 +360,7 @@ export function SupportChat() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px', color: '#00f2fe', fontWeight: 600 }}>
                 <Sparkles size={14} /> Welcome to Trading Trends Desk
               </div>
-              Ask any question about your deposit, 3% weekday yield, withdrawals, or account setup. You can chat directly with our administration team.
+              Ask any question about your deposit, 3% weekday yield, withdrawals, or account setup. You can chat directly with our Customer Support team.
             </div>
 
             {/* Quick Prompts if conversation is short */}
@@ -436,11 +436,11 @@ export function SupportChat() {
                   >
                     {isAdmin ? (
                       <>
-                        <Shield size={11} /> Admin Desk
+                        <Shield size={11} /> Customer Support
                       </>
                     ) : isBot ? (
                       <>
-                        <Bot size={11} /> Support Bot
+                        <Bot size={11} /> Customer Support
                       </>
                     ) : (
                       <>
@@ -506,7 +506,7 @@ export function SupportChat() {
             >
               <input
                 type="text"
-                placeholder="Ask support or send admin message..."
+                placeholder="Ask Customer Support a question..."
                 value={inputVal}
                 onChange={(e) => setInputVal(e.target.value)}
                 onKeyDown={handleKeyDown}
@@ -551,7 +551,7 @@ export function SupportChat() {
                 color: '#475569'
               }}
             >
-              Messages are sent directly to the Super Admin desk.
+              Messages are answered directly by Customer Support.
             </div>
           </div>
         </div>
@@ -559,3 +559,4 @@ export function SupportChat() {
     </>
   );
 }
+
