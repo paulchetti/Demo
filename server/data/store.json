@@ -394,5 +394,40 @@
     "winRate": "94.2%",
     "schedule": "Monday – Friday",
     "riskProtocol": "Capital Shielded"
-  }
+  },
+  "supportMessages": [
+    {
+      "id": "msg-1794235607608-n4h0f",
+      "userId": "user-1789369273510-cn7tm",
+      "userName": "Rahul Sharma",
+      "userEmail": "rahul@example.com",
+      "sender": "USER",
+      "text": "Hello admin, I just submitted my deposit of $300. Could you please check and verify it?",
+      "readByAdmin": false,
+      "readByUser": true,
+      "createdAt": "2026-11-09T14:46:47.608Z"
+    },
+    {
+      "id": "msg-1794235607612-vwlod",
+      "userId": "user-1789369273510-cn7tm",
+      "userName": "Trading Trends Support Bot",
+      "userEmail": "support@tradingtrends.com",
+      "sender": "BOT",
+      "text": "Hello Rahul Sharma! Your message has been routed to our Institutional Support Desk. An administrator has been notified and will reply here shortly.",
+      "readByAdmin": false,
+      "readByUser": true,
+      "createdAt": "2026-11-09T14:46:47.612Z"
+    },
+    {
+      "id": "msg-1794235607762-wektq",
+      "userId": "user-1789369273510-cn7tm",
+      "userName": "Admin Support Desk",
+      "userEmail": "support@tradingtrends.com",
+      "sender": "ADMIN",
+      "text": "Hi Rahul, we have received your deposit notification of $300 USDT. Your account balance has been updated and 3% compounding is active!",
+      "readByAdmin": true,
+      "readByUser": true,
+      "createdAt": "2026-11-09T14:46:47.762Z"
+    }
+  ]
 }

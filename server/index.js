@@ -25,7 +25,14 @@ import {
   handleTransactionStatus,
   getPublicDepositInfo
 } from './controllers/transactionController.js';
-import { authenticateToken, requireAdmin } from './middleware/auth.js';
+import {
+  getUserMessages,
+  sendUserMessage,
+  getAdminConversations,
+  sendAdminReply,
+  markAdminThreadRead
+} from './controllers/supportController.js';
+import { authenticateToken, optionalAuthenticateToken, requireAdmin } from './middleware/auth.js';
 import { getBotData, createBotTrade, deleteBotTrade, updateBotConfig, initDatabase, getSettings } from './database.js';
 
 dotenv.config();
@@ -94,6 +101,15 @@ app.get('/api/auth/me', authenticateToken, getCurrentUser);
 app.post('/api/transactions/withdraw', authenticateToken, requestWithdrawal);
 app.post('/api/transactions/deposit', authenticateToken, submitDepositNotice);
 app.get('/api/transactions/my', authenticateToken, getMyTransactions);
+
+// Support & Chatbot Routes (User / Visitor)
+app.get('/api/support/messages', optionalAuthenticateToken, getUserMessages);
+app.post('/api/support/messages', optionalAuthenticateToken, sendUserMessage);
+
+// Admin Support Desk Routes
+app.get('/api/admin/support/conversations', authenticateToken, requireAdmin, getAdminConversations);
+app.post('/api/admin/support/reply', authenticateToken, requireAdmin, sendAdminReply);
+app.put('/api/admin/support/read/:userId', authenticateToken, requireAdmin, markAdminThreadRead);
 
 // Admin Routes (Guarded by requireAdmin)
 app.get('/api/admin/users', authenticateToken, requireAdmin, listAllUsers);

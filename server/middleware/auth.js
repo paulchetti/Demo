@@ -30,6 +30,25 @@ export function authenticateToken(req, res, next) {
   });
 }
 
+export function optionalAuthenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    return next();
+  }
+
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
+    if (!err && decoded?.id) {
+      const user = getUserById(decoded.id);
+      if (user && user.status !== 'SUSPENDED') {
+        req.user = user;
+      }
+    }
+    next();
+  });
+}
+
 export function requireAdmin(req, res, next) {
   if (!req.user || req.user.role !== 'ADMIN') {
     return res.status(403).json({ error: 'Admin privileges required' });

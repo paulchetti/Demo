@@ -75,7 +75,8 @@ export async function initDatabase() {
         kycSubmissions: cloudData.kycSubmissions || [],
         settings: { ...DEFAULT_SETTINGS, ...cloudData.settings },
         botConfig: { ...DEFAULT_BOT_CONFIG, ...cloudData.botConfig },
-        botTrades: cloudData.botTrades || [...DEFAULT_BOT_TRADES]
+        botTrades: cloudData.botTrades || [...DEFAULT_BOT_TRADES],
+        supportMessages: cloudData.supportMessages || []
       };
       writeLocalDb(memoryStore);
       console.log(`✅ MongoDB Sync: Loaded ${memoryStore.users.length} users, ${memoryStore.transactions.length} transactions, and ${memoryStore.botTrades.length} bot trades from cloud.`);
@@ -102,7 +103,8 @@ function readLocalDb() {
         kycSubmissions: [],
         settings: { ...DEFAULT_SETTINGS },
         botConfig: { ...DEFAULT_BOT_CONFIG },
-        botTrades: [...DEFAULT_BOT_TRADES]
+        botTrades: [...DEFAULT_BOT_TRADES],
+        supportMessages: []
       };
       const salt = bcrypt.genSaltSync(10);
       const adminPasswordHash = bcrypt.hashSync('admin123', salt);
@@ -132,6 +134,7 @@ function readLocalDb() {
     const parsed = JSON.parse(raw);
     if (!parsed.botTrades || !Array.isArray(parsed.botTrades)) parsed.botTrades = [...DEFAULT_BOT_TRADES];
     if (!parsed.botConfig) parsed.botConfig = { ...DEFAULT_BOT_CONFIG };
+    if (!parsed.supportMessages || !Array.isArray(parsed.supportMessages)) parsed.supportMessages = [];
     return parsed;
   } catch (err) {
     console.error('Error reading database file:', err);
@@ -141,7 +144,8 @@ function readLocalDb() {
       kycSubmissions: [],
       settings: { ...DEFAULT_SETTINGS },
       botConfig: { ...DEFAULT_BOT_CONFIG },
-      botTrades: [...DEFAULT_BOT_TRADES]
+      botTrades: [...DEFAULT_BOT_TRADES],
+      supportMessages: []
     };
   }
 }
@@ -388,4 +392,58 @@ export function updateBotConfig(updates) {
   writeDb(db);
   return db.botConfig;
 }
+
+// Support & Chatbot Helpers
+export function getAllSupportMessages() {
+  const db = readDb();
+  if (!db.supportMessages) db.supportMessages = [];
+  return db.supportMessages;
+}
+
+export function getSupportMessagesByUserId(userId) {
+  const db = readDb();
+  if (!db.supportMessages) db.supportMessages = [];
+  return db.supportMessages.filter(m => m.userId === userId);
+}
+
+export function addSupportMessage({ userId, userName, userEmail, sender, text }) {
+  const db = readDb();
+  if (!db.supportMessages) db.supportMessages = [];
+  const newMsg = {
+    id: 'msg-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7),
+    userId,
+    userName: userName || 'Trader',
+    userEmail: userEmail || '',
+    sender: sender || 'USER', // 'USER', 'ADMIN', 'BOT'
+    text: (text || '').trim(),
+    readByAdmin: sender === 'ADMIN',
+    readByUser: sender === 'USER',
+    createdAt: new Date().toISOString()
+  };
+  db.supportMessages.push(newMsg);
+  writeDb(db);
+  return newMsg;
+}
+
+export function markSupportMessagesRead(userId, readerRole) {
+  const db = readDb();
+  if (!db.supportMessages) db.supportMessages = [];
+  let updated = false;
+  db.supportMessages.forEach(m => {
+    if (m.userId === userId) {
+      if (readerRole === 'ADMIN' && !m.readByAdmin) {
+        m.readByAdmin = true;
+        updated = true;
+      } else if (readerRole === 'USER' && !m.readByUser) {
+        m.readByUser = true;
+        updated = true;
+      }
+    }
+  });
+  if (updated) {
+    writeDb(db);
+  }
+  return true;
+}
+
 

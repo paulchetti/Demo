@@ -26,7 +26,13 @@ import {
   Plus,
   TrendingUp,
   Download,
-  X
+  X,
+  MessageSquare,
+  Send,
+  Bot,
+  UserCheck,
+  CornerDownRight,
+  Sparkles
 } from 'lucide-react';
 
 export function AdminDashboard() {
@@ -46,6 +52,14 @@ export function AdminDashboard() {
   const [depositModalOpen, setDepositModalOpen] = useState(false);
   const [depositToApprove, setDepositToApprove] = useState(null);
   const [depositForm, setDepositForm] = useState({ newBalance: '', note: '', mode: 'INITIAL' });
+
+  // Support Desk state
+  const [supportConversations, setSupportConversations] = useState([]);
+  const [totalSupportUnread, setTotalSupportUnread] = useState(0);
+  const [selectedConversationId, setSelectedConversationId] = useState(null);
+  const [adminReplyText, setAdminReplyText] = useState('');
+  const [adminReplySending, setAdminReplySending] = useState(false);
+  const [supportSearchQuery, setSupportSearchQuery] = useState('');
 
   // New user form state
   const [newUserForm, setNewUserForm] = useState({
@@ -126,6 +140,116 @@ export function AdminDashboard() {
       console.error('Error loading admin data:', err);
     } finally {
       setLoading(false);
+    }
+  }
+
+  // Support Desk data loader
+  async function fetchSupportData() {
+    const token = localStorage.getItem('tt_token');
+    if (!token) return;
+
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/support/conversations`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSupportConversations(data.conversations || []);
+        setTotalSupportUnread(data.totalUnread || 0);
+
+        // Auto-select first conversation if none selected
+        setSelectedConversationId(current => {
+          if (current && data.conversations.some(c => c.userId === current)) {
+            return current;
+          }
+          return data.conversations.length > 0 ? data.conversations[0].userId : null;
+        });
+      }
+    } catch (err) {
+      console.error('Error fetching support conversations:', err);
+    }
+  }
+
+  // Poll support conversations every 3.5 seconds
+  useEffect(() => {
+    fetchSupportData();
+    const interval = setInterval(fetchSupportData, 3500);
+    return () => clearInterval(interval);
+  }, []);
+
+  async function handleSelectConversation(convId) {
+    setSelectedConversationId(convId);
+    const token = localStorage.getItem('tt_token');
+
+    try {
+      await fetch(`${API_BASE}/api/admin/support/read/${convId}`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      // Optimistically mark as read
+      setSupportConversations(prev =>
+        prev.map(c => {
+          if (c.userId === convId) {
+            return {
+              ...c,
+              unreadCount: 0,
+              messages: c.messages.map(m => ({ ...m, readByAdmin: true }))
+            };
+          }
+          return c;
+        })
+      );
+      setTotalSupportUnread(prev => Math.max(0, prev - (supportConversations.find(c => c.userId === convId)?.unreadCount || 0)));
+    } catch (err) {
+      console.error('Error marking conversation read:', err);
+    }
+  }
+
+  async function handleSendAdminReply(e, predefinedText) {
+    if (e) e.preventDefault();
+    const textToSend = (predefinedText || adminReplyText).trim();
+    if (!textToSend || !selectedConversationId || adminReplySending) return;
+
+    setAdminReplySending(true);
+    const token = localStorage.getItem('tt_token');
+
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/support/reply`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          userId: selectedConversationId,
+          text: textToSend
+        })
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setAdminReplyText('');
+        // Update current conversation
+        setSupportConversations(prev =>
+          prev.map(c => {
+            if (c.userId === selectedConversationId) {
+              return {
+                ...c,
+                messages: [...c.messages, data.message],
+                lastMessage: data.message
+              };
+            }
+            return c;
+          })
+        );
+      } else {
+        alert(data.error || 'Failed to send reply');
+      }
+    } catch (err) {
+      alert('Error: ' + err.message);
+    } finally {
+      setAdminReplySending(false);
     }
   }
 
@@ -487,6 +611,7 @@ export function AdminDashboard() {
       <div className="responsive-tabs-bar" style={{ marginBottom: '24px' }}>
         {[
           { id: 'USERS', label: `Registered Users (${users.length})`, icon: Users },
+          { id: 'SUPPORT', label: `Support Desk${totalSupportUnread > 0 ? ` (${totalSupportUnread} New)` : ''}`, icon: MessageSquare, unread: totalSupportUnread },
           { id: 'KYC', label: `KYC Inquiries (${kycSubmissions.length})`, icon: FileText },
           { id: 'TRANSACTIONS', label: `Withdrawals & Deposits (${transactions.filter(t => t.status === 'PENDING').length} Pending)`, icon: ArrowUpFromLine },
           { id: 'BOT_TRADES', label: `Alpha-V Bot Trades (${botTrades.length})`, icon: Cpu },
@@ -499,6 +624,7 @@ export function AdminDashboard() {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               style={{
+                position: 'relative',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
@@ -506,7 +632,7 @@ export function AdminDashboard() {
                 background: 'transparent',
                 border: 'none',
                 borderBottom: isActive ? '2px solid #00f2fe' : '2px solid transparent',
-                color: isActive ? '#00f2fe' : '#9ca3af',
+                color: isActive ? '#00f2fe' : tab.unread > 0 ? '#ff0055' : '#9ca3af',
                 fontWeight: 600,
                 fontSize: '14px',
                 cursor: 'pointer',
@@ -517,6 +643,19 @@ export function AdminDashboard() {
             >
               <Icon size={16} />
               {tab.label}
+              {tab.unread > 0 && (
+                <span
+                  style={{
+                    marginLeft: '4px',
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    background: '#ff0055',
+                    display: 'inline-block',
+                    boxShadow: '0 0 6px #ff0055'
+                  }}
+                />
+              )}
             </button>
           );
         })}
@@ -1317,6 +1456,614 @@ export function AdminDashboard() {
                 {botConfigSaving ? 'Saving...' : 'Save Bot Display Metrics'}
               </button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 6: SUPPORT DESK & CHATBOT INBOX */}
+      {activeTab === 'SUPPORT' && (
+        <div>
+          {/* Header & Stats Banner */}
+          <div
+            className="glass-panel"
+            style={{
+              padding: '20px 24px',
+              marginBottom: '20px',
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              gap: '16px'
+            }}
+          >
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div
+                  style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '10px',
+                    background: 'linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(0, 230, 118, 0.2))',
+                    border: '1px solid rgba(0, 242, 254, 0.3)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#00f2fe'
+                  }}
+                >
+                  <MessageSquare size={18} />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#ffffff', margin: 0 }}>
+                    Live Support Desk & Chatbot Management
+                  </h3>
+                  <p style={{ fontSize: '12px', color: '#9ca3af', margin: 0 }}>
+                    Monitor user conversations, answer questions, and communicate with traders in real-time.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div
+                style={{
+                  padding: '6px 14px',
+                  borderRadius: '20px',
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  fontSize: '12px',
+                  color: '#94a3b8'
+                }}
+              >
+                Total Threads: <strong style={{ color: '#fff' }}>{supportConversations.length}</strong>
+              </div>
+
+              {totalSupportUnread > 0 ? (
+                <div
+                  style={{
+                    padding: '6px 14px',
+                    borderRadius: '20px',
+                    background: 'rgba(255, 0, 85, 0.15)',
+                    border: '1px solid #ff0055',
+                    fontSize: '12px',
+                    color: '#ff0055',
+                    fontWeight: 700,
+                    boxShadow: '0 0 10px rgba(255, 0, 85, 0.3)'
+                  }}
+                >
+                  {totalSupportUnread} Unread User Message{totalSupportUnread > 1 ? 's' : ''}
+                </div>
+              ) : (
+                <div
+                  style={{
+                    padding: '6px 14px',
+                    borderRadius: '20px',
+                    background: 'rgba(0, 230, 118, 0.1)',
+                    border: '1px solid rgba(0, 230, 118, 0.3)',
+                    fontSize: '12px',
+                    color: '#00e676',
+                    fontWeight: 600
+                  }}
+                >
+                  All Inquiries Answered
+                </div>
+              )}
+
+              <button
+                onClick={fetchSupportData}
+                className="btn btn-secondary"
+                style={{ fontSize: '12px', padding: '6px 12px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                title="Refresh Support Inbox"
+              >
+                <RefreshCw size={13} /> Refresh
+              </button>
+            </div>
+          </div>
+
+          {/* Two-Column Split Desk */}
+          <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', alignItems: 'flex-start' }}>
+            {/* LEFT COLUMN: Conversation Threads List */}
+            <div
+              className="glass-panel"
+              style={{
+                flex: '0 0 360px',
+                width: '360px',
+                maxWidth: '100%',
+                padding: '16px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px',
+                maxHeight: '720px'
+              }}
+            >
+              {/* Search bar */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: '10px',
+                  padding: '8px 12px'
+                }}
+              >
+                <Search size={14} color="#94a3b8" />
+                <input
+                  type="text"
+                  placeholder="Filter by user, email, or message..."
+                  value={supportSearchQuery}
+                  onChange={e => setSupportSearchQuery(e.target.value)}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: '#fff',
+                    fontSize: '12px',
+                    width: '100%',
+                    outline: 'none'
+                  }}
+                />
+              </div>
+
+              {/* Thread cards */}
+              <div
+                style={{
+                  overflowY: 'auto',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                  paddingRight: '4px'
+                }}
+              >
+                {supportConversations.length === 0 ? (
+                  <div
+                    style={{
+                      textAlign: 'center',
+                      padding: '40px 16px',
+                      color: '#64748b',
+                      fontSize: '13px'
+                    }}
+                  >
+                    <Bot size={32} style={{ margin: '0 auto 10px', opacity: 0.5 }} />
+                    <p style={{ margin: 0, fontWeight: 600, color: '#94a3b8' }}>No inquiries yet</p>
+                    <p style={{ margin: '4px 0 0', fontSize: '11px' }}>
+                      When users submit queries via the website chatbot, they will appear here instantly.
+                    </p>
+                  </div>
+                ) : (
+                  supportConversations
+                    .filter(c => {
+                      if (!supportSearchQuery) return true;
+                      const q = supportSearchQuery.toLowerCase();
+                      const name = (c.userName || '').toLowerCase();
+                      const email = (c.userEmail || '').toLowerCase();
+                      const hasText = c.messages?.some(m => (m.text || '').toLowerCase().includes(q));
+                      return name.includes(q) || email.includes(q) || hasText;
+                    })
+                    .map(conv => {
+                      const isSelected = conv.userId === selectedConversationId;
+                      const hasUnread = conv.unreadCount > 0;
+                      const lastMsg = conv.lastMessage;
+                      const timeStr = lastMsg?.createdAt
+                        ? new Date(lastMsg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                        : '';
+
+                      return (
+                        <div
+                          key={conv.userId}
+                          onClick={() => handleSelectConversation(conv.userId)}
+                          style={{
+                            padding: '12px 14px',
+                            borderRadius: '12px',
+                            cursor: 'pointer',
+                            background: isSelected
+                              ? 'linear-gradient(135deg, rgba(0, 242, 254, 0.12), rgba(0, 230, 118, 0.06))'
+                              : 'rgba(255, 255, 255, 0.03)',
+                            border: isSelected
+                              ? '1px solid #00f2fe'
+                              : hasUnread
+                              ? '1px solid rgba(255, 0, 85, 0.5)'
+                              : '1px solid rgba(255, 255, 255, 0.06)',
+                            transition: 'all 0.2s',
+                            boxShadow: isSelected ? '0 4px 16px rgba(0, 242, 254, 0.15)' : 'none'
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <div
+                                style={{
+                                  width: '28px',
+                                  height: '28px',
+                                  borderRadius: '50%',
+                                  background: conv.isRegisteredUser
+                                    ? 'linear-gradient(135deg, #00f2fe, #4facfe)'
+                                    : 'rgba(255, 255, 255, 0.15)',
+                                  color: conv.isRegisteredUser ? '#07090e' : '#fff',
+                                  fontWeight: 700,
+                                  fontSize: '12px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center'
+                                }}
+                              >
+                                {(conv.userName || 'T').charAt(0).toUpperCase()}
+                              </div>
+                              <div>
+                                <span style={{ fontSize: '13px', fontWeight: 700, color: '#fff' }}>
+                                  {conv.userName}
+                                </span>
+                                {conv.isRegisteredUser && (
+                                  <span
+                                    style={{
+                                      marginLeft: '6px',
+                                      fontSize: '9px',
+                                      padding: '1px 6px',
+                                      borderRadius: '10px',
+                                      background: 'rgba(0, 230, 118, 0.15)',
+                                      color: '#00e676',
+                                      fontWeight: 600
+                                    }}
+                                  >
+                                    Trader
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+
+                            <span style={{ fontSize: '10px', color: '#64748b' }}>{timeStr}</span>
+                          </div>
+
+                          {/* Last message snippet */}
+                          <div
+                            style={{
+                              fontSize: '12px',
+                              color: isSelected ? '#cbd5e1' : '#94a3b8',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                              margin: '4px 0'
+                            }}
+                          >
+                            {lastMsg?.sender === 'ADMIN' ? (
+                              <strong style={{ color: '#00f2fe' }}>You: </strong>
+                            ) : null}
+                            {lastMsg?.text || 'No messages'}
+                          </div>
+
+                          {/* Unread badge & footer */}
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
+                            <span style={{ fontSize: '11px', color: '#64748b' }}>
+                              {conv.userEmail || conv.userId}
+                            </span>
+                            {hasUnread && (
+                              <span
+                                style={{
+                                  background: '#ff0055',
+                                  color: '#fff',
+                                  fontSize: '10px',
+                                  fontWeight: 700,
+                                  padding: '2px 8px',
+                                  borderRadius: '10px',
+                                  boxShadow: '0 2px 6px rgba(255, 0, 85, 0.4)'
+                                }}
+                              >
+                                {conv.unreadCount} New
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })
+                )}
+              </div>
+            </div>
+
+            {/* RIGHT COLUMN: Active Thread & Reply Studio */}
+            <div
+              className="glass-panel"
+              style={{
+                flex: 1,
+                minWidth: '340px',
+                padding: '20px',
+                display: 'flex',
+                flexDirection: 'column',
+                minHeight: '640px',
+                position: 'relative'
+              }}
+            >
+              {(() => {
+                const activeConv = supportConversations.find(c => c.userId === selectedConversationId);
+
+                if (!activeConv) {
+                  return (
+                    <div
+                      style={{
+                        flex: 1,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: '#64748b',
+                        padding: '60px 20px'
+                      }}
+                    >
+                      <MessageSquare size={44} style={{ opacity: 0.4, marginBottom: '16px' }} />
+                      <h4 style={{ color: '#94a3b8', fontSize: '16px', margin: 0 }}>
+                        No Conversation Selected
+                      </h4>
+                      <p style={{ fontSize: '13px', margin: '6px 0 0', maxWidth: '300px', textAlign: 'center' }}>
+                        Choose an inquiry from the left panel to review user queries and reply directly.
+                      </p>
+                    </div>
+                  );
+                }
+
+                return (
+                  <>
+                    {/* Thread Header */}
+                    <div
+                      style={{
+                        paddingBottom: '16px',
+                        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
+                        gap: '12px'
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div
+                          style={{
+                            width: '42px',
+                            height: '42px',
+                            borderRadius: '12px',
+                            background: activeConv.isRegisteredUser
+                              ? 'linear-gradient(135deg, rgba(0, 242, 254, 0.3), rgba(0, 230, 118, 0.3))'
+                              : 'rgba(255, 255, 255, 0.1)',
+                            border: '1px solid rgba(0, 242, 254, 0.4)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: '#00f2fe',
+                            fontWeight: 700,
+                            fontSize: '16px'
+                          }}
+                        >
+                          {(activeConv.userName || 'T').charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <h4 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: '#fff' }}>
+                              {activeConv.userName}
+                            </h4>
+                            <span
+                              style={{
+                                width: '8px',
+                                height: '8px',
+                                borderRadius: '50%',
+                                background: '#00e676',
+                                display: 'inline-block',
+                                boxShadow: '0 0 6px #00e676'
+                              }}
+                            />
+                          </div>
+                          <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '2px' }}>
+                            {activeConv.userEmail || 'Guest Channel'} • User ID: <code style={{ color: '#00f2fe' }}>{activeConv.userId}</code>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        {activeConv.userProfile && (
+                          <>
+                            <div
+                              style={{
+                                padding: '4px 10px',
+                                borderRadius: '12px',
+                                background: 'rgba(0, 230, 118, 0.1)',
+                                border: '1px solid rgba(0, 230, 118, 0.3)',
+                                fontSize: '11px',
+                                color: '#00e676'
+                              }}
+                            >
+                              Recent Deposited Capital: <strong>${activeConv.userProfile.initialBalance} USD</strong>
+                            </div>
+                            <button
+                              onClick={() => {
+                                const fullUser = users.find(u => u.id === activeConv.userId);
+                                if (fullUser) {
+                                  setImpersonatedUser(fullUser);
+                                  setActiveView('USER_DASHBOARD');
+                                }
+                              }}
+                              className="btn btn-secondary"
+                              style={{ fontSize: '11px', padding: '5px 10px', display: 'flex', alignItems: 'center', gap: '4px' }}
+                            >
+                              <Eye size={12} /> Inspect Trader View
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Messages Scroll Area */}
+                    <div
+                      style={{
+                        flex: 1,
+                        overflowY: 'auto',
+                        padding: '16px 8px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '14px',
+                        maxHeight: '380px'
+                      }}
+                    >
+                      {activeConv.messages.map((msg, index) => {
+                        const isUser = msg.sender === 'USER';
+                        const isAdmin = msg.sender === 'ADMIN';
+                        const isBot = msg.sender === 'BOT';
+                        const timeStr = msg.createdAt
+                          ? new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                          : '';
+
+                        return (
+                          <div
+                            key={msg.id || index}
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: isAdmin ? 'flex-end' : 'flex-start',
+                              maxWidth: '82%',
+                              alignSelf: isAdmin ? 'flex-end' : 'flex-start'
+                            }}
+                          >
+                            <div
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                fontSize: '11px',
+                                marginBottom: '3px',
+                                color: isAdmin ? '#00f2fe' : isBot ? '#00e676' : '#94a3b8',
+                                fontWeight: 600
+                              }}
+                            >
+                              {isAdmin ? (
+                                <>
+                                  <Shield size={12} /> You (Admin Desk)
+                                </>
+                              ) : isBot ? (
+                                <>
+                                  <Bot size={12} /> Automated System Bot
+                                </>
+                              ) : (
+                                <>
+                                  <Users size={12} /> {activeConv.userName}
+                                </>
+                              )}
+                              <span style={{ color: '#64748b', fontWeight: 400, marginLeft: '4px' }}>
+                                {timeStr}
+                              </span>
+                            </div>
+
+                            <div
+                              style={{
+                                padding: '10px 16px',
+                                borderRadius: isAdmin ? '14px 14px 2px 14px' : '14px 14px 14px 2px',
+                                background: isAdmin
+                                  ? 'linear-gradient(135deg, rgba(0, 242, 254, 0.25), rgba(79, 172, 254, 0.25))'
+                                  : isBot
+                                  ? 'rgba(0, 230, 118, 0.12)'
+                                  : 'rgba(255, 255, 255, 0.05)',
+                                border: isAdmin
+                                  ? '1px solid rgba(0, 242, 254, 0.45)'
+                                  : isBot
+                                  ? '1px solid rgba(0, 230, 118, 0.3)'
+                                  : '1px solid rgba(255, 255, 255, 0.12)',
+                                color: '#fff',
+                                fontSize: '13px',
+                                lineHeight: 1.5,
+                                wordBreak: 'break-word',
+                                boxShadow: isAdmin ? '0 4px 14px rgba(0, 242, 254, 0.15)' : 'none'
+                              }}
+                            >
+                              {msg.text}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Quick Response Templates */}
+                    <div style={{ marginTop: '8px', paddingTop: '10px', borderTop: '1px solid rgba(255, 255, 255, 0.06)' }}>
+                      <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 600, marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <Sparkles size={11} color="#00f2fe" /> Quick Response Presets (Click to insert & send):
+                      </div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                        {[
+                          'Deposit confirmed! Your account balance has been updated and 3% compounding is active.',
+                          'Please provide your blockchain transaction hash (TxID) so our compliance desk can verify the transfer.',
+                          'Your withdrawal request has been approved and settled successfully to your wallet.',
+                          'Our algorithmic growth bot runs Monday through Friday with capital protection.'
+                        ].map((preset, pIdx) => (
+                          <button
+                            key={pIdx}
+                            onClick={() => handleSendAdminReply(null, preset)}
+                            style={{
+                              background: 'rgba(255, 255, 255, 0.04)',
+                              border: '1px solid rgba(255, 255, 255, 0.1)',
+                              borderRadius: '16px',
+                              padding: '4px 10px',
+                              color: '#94a3b8',
+                              fontSize: '11px',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s',
+                              textAlign: 'left'
+                            }}
+                            onMouseEnter={e => {
+                              e.currentTarget.style.borderColor = '#00f2fe';
+                              e.currentTarget.style.color = '#00f2fe';
+                            }}
+                            onMouseLeave={e => {
+                              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                              e.currentTarget.style.color = '#94a3b8';
+                            }}
+                          >
+                            + {preset.length > 45 ? preset.substring(0, 45) + '...' : preset}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Reply Input Form */}
+                    <form onSubmit={handleSendAdminReply} style={{ marginTop: '12px' }}>
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          background: 'rgba(0, 0, 0, 0.4)',
+                          border: '1px solid rgba(0, 242, 254, 0.3)',
+                          borderRadius: '12px',
+                          padding: '6px 8px 6px 14px'
+                        }}
+                      >
+                        <input
+                          type="text"
+                          placeholder={`Type direct reply to ${activeConv.userName}...`}
+                          value={adminReplyText}
+                          onChange={e => setAdminReplyText(e.target.value)}
+                          disabled={adminReplySending}
+                          style={{
+                            flex: 1,
+                            background: 'transparent',
+                            border: 'none',
+                            color: '#fff',
+                            fontSize: '13px',
+                            outline: 'none'
+                          }}
+                        />
+                        <button
+                          type="submit"
+                          disabled={!adminReplyText.trim() || adminReplySending}
+                          className="btn btn-primary"
+                          style={{
+                            padding: '8px 16px',
+                            fontSize: '13px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px'
+                          }}
+                        >
+                          <Send size={14} /> {adminReplySending ? 'Sending...' : 'Send Reply'}
+                        </button>
+                      </div>
+                    </form>
+                  </>
+                );
+              })()}
+            </div>
           </div>
         </div>
       )}

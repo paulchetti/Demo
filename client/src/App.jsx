@@ -6,11 +6,15 @@ import { LoginModal } from './components/LoginModal';
 import { LandingPage } from './pages/LandingPage';
 import { UserDashboard } from './pages/UserDashboard';
 import { AdminDashboard } from './pages/AdminDashboard';
+import { SupportChat } from './components/SupportChat';
 
 function MainApp() {
   const { user, activeView, impersonatedUser } = useAuth();
   const [kycModalOpen, setKycModalOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
+
+  // Show floating support chat widget for all user and guest views
+  const showSupportChat = !(activeView === 'ADMIN_DASHBOARD' && user?.role === 'ADMIN' && !impersonatedUser);
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -33,6 +37,8 @@ function MainApp() {
           />
         )}
       </main>
+
+      {showSupportChat && <SupportChat />}
 
       <KycModal
         isOpen={kycModalOpen}
