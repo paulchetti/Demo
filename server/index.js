@@ -34,7 +34,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5050;
 
 app.use(cors({
   origin: '*',
@@ -158,7 +158,7 @@ initDatabase().then(() => {
     console.log(`====================================================`);
     console.log(`🚀 Trading Trends Backend running on http://localhost:${PORT}`);
     console.log(`🔑 Default Admin: admin / admin123`);
-    console.log(`📈 Automated Mon-Fri $50/day growth engine initialized`);
+    console.log(`📈 Automated Mon-Fri 3%/day compounding growth engine initialized`);
     console.log(`====================================================`);
   });
 }).catch(err => {

@@ -1,12 +1,12 @@
 /**
  * Trading Trends Wallet Engine
- * Handles automated calculation of $50/day growth from Monday to Friday.
+ * Handles automated calculation of 3% daily compounding growth from Monday to Friday.
  * Freezes growth on Saturdays and Sundays.
  */
 
 export function calculateUserWallet(user, approvedWithdrawalsTotal = 0) {
   const initialBalance = Number(user.initialBalance) || 200;
-  const dailyRate = Number(user.dailyGrowthRate) !== undefined ? Number(user.dailyGrowthRate) : 50;
+  const dailyRate = Number(user.dailyGrowthRate) !== undefined ? Number(user.dailyGrowthRate) : 3;
   const manualAdjustment = Number(user.manualAdjustment) || 0;
   const growthStartDate = user.growthStartDate ? new Date(user.growthStartDate) : new Date(user.createdAt);
 
@@ -26,6 +26,7 @@ export function calculateUserWallet(user, approvedWithdrawalsTotal = 0) {
 
   let weekdaysElapsed = 0;
   let runningBalance = initialBalance;
+  let todayAdded = 0;
   const history = [];
 
   // Record day 0 (Initial deposit/start date)
@@ -34,7 +35,7 @@ export function calculateUserWallet(user, approvedWithdrawalsTotal = 0) {
     dayOfWeek: getDayName(currentDate.getUTCDay()),
     isWeekend: isWeekend(currentDate.getUTCDay()),
     growthAmount: 0,
-    balance: runningBalance,
+    balance: Math.round(runningBalance * 100) / 100,
     note: 'Initial Account Deposit'
   });
 
@@ -46,9 +47,11 @@ export function calculateUserWallet(user, approvedWithdrawalsTotal = 0) {
     
     let added = 0;
     if (!isWknd && user.status === 'ACTIVE') {
-      added = dailyRate;
+      added = Math.round(runningBalance * (dailyRate / 100) * 100) / 100;
       weekdaysElapsed++;
       runningBalance += added;
+      runningBalance = Math.round(runningBalance * 100) / 100;
+      todayAdded = added;
     }
 
     history.push({
@@ -56,16 +59,17 @@ export function calculateUserWallet(user, approvedWithdrawalsTotal = 0) {
       dayOfWeek: getDayName(dayOfWeek),
       isWeekend: isWknd,
       growthAmount: added,
-      balance: runningBalance,
-      note: isWknd ? 'Market Paused (Weekend)' : `Algorithmic Yield (+$${added})`
+      balance: Math.round(runningBalance * 100) / 100,
+      note: isWknd ? 'Market Paused (Weekend)' : `Algorithmic Yield (+${dailyRate}% / +$${added.toFixed(2)})`
     });
   }
 
-  const calculatedGrowth = weekdaysElapsed * dailyRate;
-  const currentTotal = initialBalance + calculatedGrowth + manualAdjustment - approvedWithdrawalsTotal;
+  const calculatedGrowth = Math.max(0, Math.round((runningBalance - initialBalance) * 100) / 100);
+  const currentTotal = runningBalance + manualAdjustment - approvedWithdrawalsTotal;
 
   const currentDayOfWeek = now.getUTCDay();
   const currentIsWeekend = isWeekend(currentDayOfWeek);
+  const projectedTodayProfit = Math.round(runningBalance * (dailyRate / 100) * 100) / 100;
 
   return {
     initialBalance,
@@ -75,7 +79,7 @@ export function calculateUserWallet(user, approvedWithdrawalsTotal = 0) {
     calculatedGrowth,
     manualAdjustment,
     approvedWithdrawalsTotal,
-    todayProfit: currentIsWeekend || user.status !== 'ACTIVE' ? 0 : dailyRate,
+    todayProfit: currentIsWeekend || user.status !== 'ACTIVE' ? 0 : (todayAdded || projectedTodayProfit),
     isWeekend: currentIsWeekend,
     growthStatus: user.status !== 'ACTIVE' ? 'PAUSED' : currentIsWeekend ? 'WEEKEND_PAUSED' : 'ACTIVE_GROWING',
     history: history.reverse() // Most recent first

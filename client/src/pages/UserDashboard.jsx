@@ -75,7 +75,7 @@ export function UserDashboard() {
 
   const isWeekend = wallet?.isWeekend;
   const currentBalance = wallet?.currentBalance || 0;
-  const dailyRate = wallet?.dailyGrowthRate ?? 50;
+  const dailyRate = wallet?.dailyGrowthRate ?? 3;
   const todayProfit = wallet?.todayProfit || 0;
 
   return (
@@ -205,7 +205,7 @@ export function UserDashboard() {
             <div>
               <div style={{ fontSize: '11px', color: '#9ca3af' }}>Automated Compounding</div>
               <div style={{ fontSize: '14px', fontWeight: 600, color: '#00f2fe' }}>
-                +${dailyRate.toFixed(2)}/day (Mon-Fri)
+                +{dailyRate}% / day (Mon-Fri)
               </div>
             </div>
           </div>
@@ -429,7 +429,7 @@ export function UserDashboard() {
                       {row.dayOfWeek}
                     </td>
                     <td style={{ padding: '10px', fontWeight: 700, fontFamily: 'JetBrains Mono', color: row.isWeekend ? '#9ca3af' : '#00e676' }}>
-                      {row.growthAmount > 0 ? `+$${row.growthAmount}.00` : '$0.00'}
+                      {row.growthAmount > 0 ? `+$${row.growthAmount.toFixed(2)}` : '$0.00'}
                     </td>
                     <td style={{ padding: '10px', fontWeight: 700, fontFamily: 'JetBrains Mono', color: '#ffffff' }}>
                       ${row.balance.toFixed(2)} USD

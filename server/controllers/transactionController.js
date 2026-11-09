@@ -1,9 +1,11 @@
 import {
   createTransaction,
   getTransactionsByUserId,
+  getTransactionById,
   getAllTransactions,
   updateTransaction,
   getUserById,
+  updateUser,
   getSettings
 } from '../database.js';
 import { calculateUserWallet } from '../services/walletEngine.js';
@@ -120,20 +122,39 @@ export async function listAllTransactionsAdmin(req, res) {
 export async function handleTransactionStatus(req, res) {
   try {
     const { id } = req.params;
-    const { status, note } = req.body;
+    const { status, note, newBalance } = req.body;
 
     if (!['APPROVED', 'REJECTED', 'PENDING'].includes(status)) {
       return res.status(400).json({ error: 'Invalid status' });
+    }
+
+    const tx = getTransactionById(id);
+    if (!tx) {
+      return res.status(404).json({ error: 'Transaction not found' });
+    }
+
+    // When approving a DEPOSIT, credit the user's wallet
+    if (status === 'APPROVED' && tx.type === 'DEPOSIT') {
+      const user = getUserById(tx.userId);
+      if (user) {
+        let targetBalance;
+        if (newBalance !== undefined && newBalance !== null && newBalance !== '') {
+          targetBalance = Math.max(0, Number(newBalance));
+        } else {
+          targetBalance = (Number(user.initialBalance) || 0) + Number(tx.amount);
+        }
+        updateUser(user.id, {
+          initialBalance: targetBalance,
+          growthStartDate: new Date().toISOString(),
+          manualAdjustment: 0
+        });
+      }
     }
 
     const updated = updateTransaction(id, {
       status,
       note: note !== undefined ? note : undefined
     });
-
-    if (!updated) {
-      return res.status(404).json({ error: 'Transaction not found' });
-    }
 
     return res.json({
       success: true,

@@ -154,8 +154,8 @@ export function KycModal({ isOpen, onClose }) {
               <div style={{ fontWeight: 600, color: '#00f2fe', marginBottom: '4px' }}>What happens next?</div>
               <ul style={{ paddingLeft: '20px', lineHeight: '1.6' }}>
                 <li>Our compliance desk reviews your Aadhaar & PAN submissions.</li>
-                <li>An administrator issues your verified credentials and guides you to fund the minimum initial investment ($200–$500 USD).</li>
-                <li>Once your initial deposit is confirmed, your 50 USDT daily yield activates every Monday to Friday.</li>
+                <li>An administrator issues your verified credentials and guides you to fund the minimum initial investment ($200+ USD, any amount).</li>
+                <li>Once your initial deposit is confirmed, your 3% daily compounding growth activates every Monday to Friday.</li>
               </ul>
             </div>
             <button className="btn btn-primary" style={{ width: '100%' }} onClick={onClose}>

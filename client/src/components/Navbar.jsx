@@ -159,7 +159,7 @@ export function Navbar({ onOpenKyc, onOpenLogin }) {
           }}></span>
           <span style={{ color: '#9ca3af' }}>Engine:</span>
           <span style={{ color: '#ffffff', fontWeight: 600 }}>
-            {isWeekend ? 'Weekend Paused (Market Closed)' : 'Mon-Fri Algorithmic Yield (+$50/day)'}
+            {isWeekend ? 'Weekend Paused (Market Closed)' : 'Mon-Fri Algorithmic Yield (+3%/day)'}
           </span>
         </div>
 
@@ -381,7 +381,7 @@ export function Navbar({ onOpenKyc, onOpenLogin }) {
                   Engine Protocol:
                 </span>
                 <span style={{ fontWeight: 600, color: isWeekend ? '#ffb703' : '#00e676' }}>
-                  {isWeekend ? 'Weekend Paused' : 'Mon-Fri Yield Active (+$50)'}
+                  {isWeekend ? 'Weekend Paused' : 'Mon-Fri Yield Active (+3%)'}
                 </span>
               </div>
 

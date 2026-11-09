@@ -88,7 +88,7 @@ export function LandingPage({ onOpenKyc, onOpenLogin }) {
               Weekday Target Yield
             </div>
             <div style={{ fontSize: 'clamp(22px, 5vw, 28px)', fontWeight: 800, color: '#00e676', fontFamily: 'JetBrains Mono' }}>
-              +$50 / Day
+              +3% / Day
             </div>
             <div style={{ fontSize: '11px', color: '#6b7280', marginTop: '4px' }}>Active Monday to Friday</div>
           </div>
@@ -98,9 +98,9 @@ export function LandingPage({ onOpenKyc, onOpenLogin }) {
               Minimum Initial Investment
             </div>
             <div style={{ fontSize: 'clamp(22px, 5vw, 28px)', fontWeight: 800, color: '#00f2fe', fontFamily: 'JetBrains Mono' }}>
-              $200 – $500
+              $200+
             </div>
-            <div style={{ fontSize: '11px', color: '#6b7280', marginTop: '4px' }}>Required Deposit to Start</div>
+            <div style={{ fontSize: '11px', color: '#6b7280', marginTop: '4px' }}>Required Deposit (No Upper Limit)</div>
           </div>
 
           <div className="glass-panel" style={{ padding: '18px 14px', textAlign: 'center' }}>
@@ -179,7 +179,7 @@ export function LandingPage({ onOpenKyc, onOpenLogin }) {
               Admin Verification & Initial Deposit
             </h3>
             <p style={{ fontSize: '13px', color: '#9ca3af', lineHeight: '1.6' }}>
-              Our administrative desk reviews your KYC application and issues your verified credentials. Deposit the minimum initial investment ($200 to $500 USD) to activate your account and start earning 50 USDT daily.
+              Our administrative desk reviews your KYC application and issues your verified credentials. Deposit the minimum initial investment ($200+ USD, any amount) to activate your account and start earning 3% daily compounding growth.
             </p>
           </div>
 
@@ -202,7 +202,7 @@ export function LandingPage({ onOpenKyc, onOpenLogin }) {
               Mon–Fri Automated Profit
             </h3>
             <p style={{ fontSize: '13px', color: '#9ca3af', lineHeight: '1.6' }}>
-              Your account automatically gains +$50.00 USD each business day (Monday through Friday). On Saturdays and Sundays, growth pauses cleanly to reflect closed markets.
+              Your account automatically gains +3% compounding yield each business day (Monday through Friday). On Saturdays and Sundays, growth pauses cleanly to reflect closed markets.
             </p>
           </div>
 
@@ -250,7 +250,7 @@ export function LandingPage({ onOpenKyc, onOpenLogin }) {
                   <CheckCircle size={16} color="#00e676" style={{ flexShrink: 0 }} /> Strict Aadhaar & PAN verification before credential issuance
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#e5e7eb', fontSize: '13px' }}>
-                  <CheckCircle size={16} color="#00e676" style={{ flexShrink: 0 }} /> Guaranteed +$50.00 weekday growth rate (Mon-Fri)
+                  <CheckCircle size={16} color="#00e676" style={{ flexShrink: 0 }} /> Guaranteed +3.0% daily weekday growth rate (Mon-Fri)
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#e5e7eb', fontSize: '13px' }}>
                   <CheckCircle size={16} color="#00e676" style={{ flexShrink: 0 }} /> Seamless USDT TRC-20 & Binance ID payouts
@@ -266,24 +266,24 @@ export function LandingPage({ onOpenKyc, onOpenLogin }) {
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                 <span style={{ fontSize: '12px', color: '#9ca3af' }}>Sample Account Growth Curve</span>
-                <span className="badge badge-emerald">Active +$50/Day</span>
+                <span className="badge badge-emerald">Active +3%/Day</span>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', padding: '8px 12px', background: '#0e1422', borderRadius: '8px' }}>
                   <span style={{ color: '#9ca3af' }}>Initial Investment Deposit</span>
-                  <strong style={{ color: '#ffffff' }}>$250.00 USD</strong>
+                  <strong style={{ color: '#ffffff' }}>$200.00 USD</strong>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', padding: '8px 12px', background: '#0e1422', borderRadius: '8px' }}>
                   <span style={{ color: '#9ca3af' }}>Day 1 (Monday)</span>
-                  <strong style={{ color: '#00e676' }}>$300.00 USD (+$50)</strong>
+                  <strong style={{ color: '#00e676' }}>$206.00 USD (+3.0%)</strong>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', padding: '8px 12px', background: '#0e1422', borderRadius: '8px' }}>
                   <span style={{ color: '#9ca3af' }}>Day 2 (Tuesday)</span>
-                  <strong style={{ color: '#00e676' }}>$350.00 USD (+$50)</strong>
+                  <strong style={{ color: '#00e676' }}>$212.18 USD (+3.0%)</strong>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', padding: '8px 12px', background: '#0e1422', borderRadius: '8px' }}>
                   <span style={{ color: '#9ca3af' }}>Weekend (Sat & Sun)</span>
-                  <strong style={{ color: '#ffb703' }}>$350.00 USD (Paused)</strong>
+                  <strong style={{ color: '#ffb703' }}>$212.18 USD (Paused)</strong>
                 </div>
               </div>
             </div>
@@ -297,7 +297,7 @@ export function LandingPage({ onOpenKyc, onOpenLogin }) {
           Ready to Begin with Trading Trends?
         </h2>
         <p style={{ color: '#9ca3af', fontSize: '14px', maxWidth: '600px', margin: '0 auto 28px', padding: '0 8px' }}>
-          Submit your KYC credentials today. Once approved by administration, receive your verified credentials, fund the minimum initial investment ($200–$500 USD), and start earning 50 USDT every weekday.
+          Submit your KYC credentials today. Once approved by administration, receive your verified credentials, fund the minimum initial investment ($200+ USD, any amount), and start earning 3% compounding growth every weekday.
         </p>
         <button
           className="btn btn-primary"

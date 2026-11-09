@@ -34,7 +34,7 @@ const DEFAULT_SETTINGS = {
 
 export const DEFAULT_BOT_CONFIG = {
   status: 'ACTIVE', // 'ACTIVE' or 'PAUSED'
-  dailyYield: '+$50.00 USD',
+  dailyYield: '+3.0% / Day',
   winRate: '94.2%',
   schedule: 'Monday – Friday',
   riskProtocol: 'Capital Shielded'
@@ -211,7 +211,7 @@ export function createUser(userData) {
     aadharNo: userData.aadharNo || '',
     panNo: userData.panNo || '',
     initialBalance: Number(userData.initialBalance) || 200,
-    dailyGrowthRate: Number(userData.dailyGrowthRate) !== undefined ? Number(userData.dailyGrowthRate) : 50,
+    dailyGrowthRate: Number(userData.dailyGrowthRate) !== undefined ? Number(userData.dailyGrowthRate) : 3,
     growthStartDate: userData.growthStartDate || new Date().toISOString(),
     manualAdjustment: Number(userData.manualAdjustment) || 0,
     status: userData.status || 'ACTIVE',
@@ -261,6 +261,11 @@ export function getAllTransactions() {
 export function getTransactionsByUserId(userId) {
   const db = readDb();
   return db.transactions.filter(t => t.userId === userId);
+}
+
+export function getTransactionById(id) {
+  const db = readDb();
+  return db.transactions.find(t => t.id === id);
 }
 
 export function createTransaction(txData) {

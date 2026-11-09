@@ -226,7 +226,7 @@ export function DepositModal({ isOpen, onClose }) {
         }}>
           <AlertTriangle size={18} color="#ffb703" style={{ flexShrink: 0, marginTop: '2px' }} />
           <p style={{ fontSize: '12px', color: '#ffb703', lineHeight: '1.5' }}>
-            {depositInfo.note || 'Transfer USDT TRC-20 exclusively. Admin verification required.'}
+            {depositInfo.note || 'Transfer USDT TRC-20 exclusively (Minimum deposit $200 USD, any amount with no upper limit). Admin verification required.'}
           </p>
         </div>
 
@@ -240,7 +240,7 @@ export function DepositModal({ isOpen, onClose }) {
             Already Transferred? Notify Compliance (Optional)
           </div>
           <p style={{ fontSize: '11px', color: '#9ca3af', marginBottom: '10px' }}>
-            Submit your deposit amount and transaction hash (TxID) to expedite account crediting.
+            Submit your deposit amount (min $200) and transaction hash (TxID) to expedite account crediting.
           </p>
 
           {noticeSuccess && (
@@ -261,7 +261,8 @@ export function DepositModal({ isOpen, onClose }) {
             <div className="responsive-form-grid" style={{ marginBottom: '10px' }}>
               <input
                 type="number"
-                placeholder="Amount (USD)"
+                placeholder="Amount (USD, Min $200)"
+                min="200"
                 value={amount}
                 onChange={e => setAmount(e.target.value)}
                 className="input-field"

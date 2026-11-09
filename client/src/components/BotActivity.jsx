@@ -12,7 +12,7 @@ export function BotActivity({ isWeekend = false }) {
 
   const [botConfig, setBotConfig] = useState({
     status: 'ACTIVE',
-    dailyYield: '+$50.00 USD',
+    dailyYield: '+3.0% / Day',
     winRate: '94.2%',
     schedule: 'Monday – Friday',
     riskProtocol: 'Capital Shielded'
@@ -82,7 +82,7 @@ export function BotActivity({ isWeekend = false }) {
         <div style={{ background: '#090d16', padding: '10px 12px', borderRadius: '10px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
           <div style={{ fontSize: '10px', color: '#9ca3af', textTransform: 'uppercase' }}>Daily Strategy Yield</div>
           <div style={{ fontSize: '15px', fontWeight: 700, color: isPaused ? '#9ca3af' : '#00e676', fontFamily: 'JetBrains Mono', marginTop: '2px' }}>
-            {isPaused ? '$0.00 (Paused)' : botConfig.dailyYield || '+$50.00 USD'}
+            {isPaused ? '0.00% (Paused)' : botConfig.dailyYield || '+3.0% / Day'}
           </div>
         </div>
 

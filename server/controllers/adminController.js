@@ -52,7 +52,7 @@ export async function createNewUser(req, res) {
       aadharNo,
       panNo,
       initialBalance = 200,
-      dailyGrowthRate = 50,
+      dailyGrowthRate = 3,
       status = 'ACTIVE',
       sendEmailToUser = true
     } = req.body;

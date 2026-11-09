@@ -25,7 +25,8 @@ import {
   Cpu,
   Plus,
   TrendingUp,
-  Download
+  Download,
+  X
 } from 'lucide-react';
 
 export function AdminDashboard() {
@@ -42,6 +43,9 @@ export function AdminDashboard() {
   const [createUserModalOpen, setCreateUserModalOpen] = useState(false);
   const [editUserModalOpen, setEditUserModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [depositModalOpen, setDepositModalOpen] = useState(false);
+  const [depositToApprove, setDepositToApprove] = useState(null);
+  const [depositForm, setDepositForm] = useState({ newBalance: '', note: '', mode: 'INITIAL' });
 
   // New user form state
   const [newUserForm, setNewUserForm] = useState({
@@ -54,8 +58,8 @@ export function AdminDashboard() {
     address: '',
     aadharNo: '',
     panNo: '',
-    initialBalance: 250,
-    dailyGrowthRate: 50,
+    initialBalance: 200,
+    dailyGrowthRate: 3,
     status: 'ACTIVE',
     sendEmailToUser: true
   });
@@ -67,7 +71,7 @@ export function AdminDashboard() {
   const [botTrades, setBotTrades] = useState([]);
   const [botConfig, setBotConfig] = useState({
     status: 'ACTIVE',
-    dailyYield: '+$50.00 USD',
+    dailyYield: '+3.0% / Day',
     winRate: '94.2%',
     schedule: 'Monday – Friday',
     riskProtocol: 'Capital Shielded'
@@ -155,8 +159,8 @@ export function AdminDashboard() {
         address: '',
         aadharNo: '',
         panNo: '',
-        initialBalance: 250,
-        dailyGrowthRate: 50,
+        initialBalance: 200,
+        dailyGrowthRate: 3,
         status: 'ACTIVE',
         sendEmailToUser: true
       });
@@ -179,7 +183,7 @@ export function AdminDashboard() {
       panNo: user.panNo || '',
       password: '', // leave empty if not changing
       status: user.status || 'ACTIVE',
-      dailyGrowthRate: user.dailyGrowthRate ?? 50,
+      dailyGrowthRate: user.dailyGrowthRate ?? 3,
       overrideBalance: user.wallet?.currentBalance || user.initialBalance
     });
     setEditUserModalOpen(true);
@@ -227,7 +231,7 @@ export function AdminDashboard() {
     }
   }
 
-  async function handleTransactionAction(txId, status) {
+  async function handleTransactionAction(txId, status, extra = {}) {
     const token = localStorage.getItem('tt_token');
     try {
       const res = await fetch(`${API_BASE}/api/admin/transactions/${txId}/status`, {
@@ -236,7 +240,7 @@ export function AdminDashboard() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ status })
+        body: JSON.stringify({ status, ...extra })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
@@ -244,6 +248,32 @@ export function AdminDashboard() {
     } catch (err) {
       alert('Error: ' + err.message);
     }
+  }
+
+  function handleOpenApproveDeposit(tx) {
+    const targetUser = users.find(u => u.id === tx.userId);
+    const initialBal = Number(targetUser?.initialBalance) || 0;
+    const currentBal = Number(targetUser?.wallet?.currentBalance || targetUser?.initialBalance) || 0;
+    const depositAmt = Number(tx.amount) || 0;
+
+    setDepositToApprove({ ...tx, user: targetUser, initialBal, currentBal, depositAmt });
+    setDepositForm({
+      newBalance: Math.round((initialBal + depositAmt) * 100) / 100,
+      note: `Deposit of $${depositAmt.toFixed(2)} USD verified and credited.`,
+      mode: 'INITIAL'
+    });
+    setDepositModalOpen(true);
+  }
+
+  async function handleConfirmApproveDeposit(e) {
+    e.preventDefault();
+    if (!depositToApprove) return;
+    await handleTransactionAction(depositToApprove.id, 'APPROVED', {
+      newBalance: Number(depositForm.newBalance),
+      note: depositForm.note
+    });
+    setDepositModalOpen(false);
+    setDepositToApprove(null);
   }
 
   async function handleSaveSettings(e) {
@@ -362,8 +392,8 @@ export function AdminDashboard() {
       address: sub.address,
       aadharNo: sub.aadhar,
       panNo: sub.pan,
-      initialBalance: 250,
-      dailyGrowthRate: 50,
+      initialBalance: 200,
+      dailyGrowthRate: 3,
       status: 'ACTIVE',
       sendEmailToUser: true
     });
@@ -526,8 +556,8 @@ export function AdminDashboard() {
                 <tr style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)', color: '#9ca3af' }}>
                   <th style={{ padding: '12px 10px' }}>User Details</th>
                   <th style={{ padding: '12px 10px' }}>Current Balance</th>
-                  <th style={{ padding: '12px 10px' }}>Initial Deposit ($200–$500)</th>
-                  <th style={{ padding: '12px 10px' }}>Daily Rate (Mon-Fri)</th>
+                  <th style={{ padding: '12px 10px' }}>Initial Deposit ($200+ Min)</th>
+                  <th style={{ padding: '12px 10px' }}>Daily Rate (% / Mon-Fri)</th>
                   <th style={{ padding: '12px 10px' }}>KYC Aadhaar & PAN</th>
                   <th style={{ padding: '12px 10px' }}>Status</th>
                   <th style={{ padding: '12px 10px', textAlign: 'right' }}>Admin Controls</th>
@@ -555,7 +585,7 @@ export function AdminDashboard() {
                       </td>
 
                       <td style={{ padding: '12px 10px', fontFamily: 'JetBrains Mono', color: '#00f2fe' }}>
-                        +${u.dailyGrowthRate ?? 50}/day
+                        +{u.dailyGrowthRate ?? 3}%/day
                       </td>
 
                       <td style={{ padding: '12px 10px', fontSize: '11px', fontFamily: 'JetBrains Mono' }}>
@@ -761,7 +791,13 @@ export function AdminDashboard() {
                       {tx.status === 'PENDING' ? (
                         <div style={{ display: 'inline-flex', gap: '6px' }}>
                           <button
-                            onClick={() => handleTransactionAction(tx.id, 'APPROVED')}
+                            onClick={() => {
+                              if (tx.type === 'DEPOSIT') {
+                                handleOpenApproveDeposit(tx);
+                              } else {
+                                handleTransactionAction(tx.id, 'APPROVED');
+                              }
+                            }}
                             className="btn btn-emerald"
                             style={{ padding: '6px 12px', fontSize: '11px' }}
                           >
@@ -1437,12 +1473,12 @@ export function AdminDashboard() {
                       style={{ fontFamily: 'JetBrains Mono', fontSize: '15px', color: '#ffd700', fontWeight: 700 }}
                       required
                     />
-                    <span style={{ fontSize: '11px', color: '#9ca3af' }}>User Minimum Investment: $200 – $500 USD</span>
+                    <span style={{ fontSize: '11px', color: '#9ca3af' }}>User Minimum Investment: $200+ USD (Any Amount)</span>
                   </div>
 
                   <div>
                     <label style={{ display: 'block', fontSize: '12px', color: '#ffffff', marginBottom: '4px' }}>
-                      Daily Growth Increment (Mon-Fri) *
+                      Daily Growth Percentage (Mon-Fri %) *
                     </label>
                     <input
                       type="number"
@@ -1452,7 +1488,7 @@ export function AdminDashboard() {
                       style={{ fontFamily: 'JetBrains Mono', fontSize: '15px', color: '#00e676', fontWeight: 700 }}
                       required
                     />
-                    <span style={{ fontSize: '11px', color: '#9ca3af' }}>Default: +$50 USD / weekday</span>
+                    <span style={{ fontSize: '11px', color: '#9ca3af' }}>Default: +3% / weekday</span>
                   </div>
                 </div>
               </div>
@@ -1517,14 +1553,14 @@ export function AdminDashboard() {
                   style={{ fontSize: '18px', fontWeight: 800, fontFamily: 'JetBrains Mono', color: '#ffd700' }}
                 />
                 <p style={{ fontSize: '11px', color: '#9ca3af', marginTop: '6px' }}>
-                  Modifying this instantly updates what the user sees in their wallet. The Mon–Fri +$50/day growth will continue smoothly from this updated amount.
+                  Modifying this instantly updates what the user sees in their wallet. The Mon–Fri 3%/day growth will continue smoothly from this updated amount.
                 </p>
               </div>
 
               <div className="responsive-form-grid" style={{ marginBottom: '12px' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '11px', color: '#9ca3af', marginBottom: '4px' }}>
-                    Daily Growth Rate (Mon-Fri)
+                    Daily Growth Rate (Mon-Fri %)
                   </label>
                   <input
                     type="number"
@@ -1660,6 +1696,193 @@ export function AdminDashboard() {
                 </button>
                 <button type="submit" className="btn btn-primary" style={{ flex: 2 }}>
                   Save All Dashboard Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: APPROVE DEPOSIT & UPDATE BALANCE */}
+      {depositModalOpen && depositToApprove && (
+        <div className="modal-overlay" onClick={() => setDepositModalOpen(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '580px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '10px',
+                  background: 'rgba(0, 230, 118, 0.12)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <ArrowDownToLine size={20} color="#00e676" />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#ffffff' }}>Approve Deposit & Credit Wallet</h3>
+                  <p style={{ fontSize: '12px', color: '#9ca3af' }}>Verify funds on blockchain and update user wallet</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setDepositModalOpen(false)}
+                style={{ background: 'transparent', border: 'none', color: '#9ca3af', cursor: 'pointer', padding: '6px' }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleConfirmApproveDeposit}>
+              {/* User & Request Info Banner */}
+              <div style={{
+                background: '#090d16',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: '12px',
+                padding: '14px',
+                marginBottom: '16px'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <span style={{ fontSize: '14px', fontWeight: 700, color: '#ffffff' }}>
+                    {depositToApprove.userName} (@{depositToApprove.user?.username || 'user'})
+                  </span>
+                  <span className="badge badge-emerald" style={{ fontFamily: 'JetBrains Mono', fontSize: '13px' }}>
+                    +${depositToApprove.depositAmt.toFixed(2)} USD
+                  </span>
+                </div>
+                <div style={{ fontSize: '11px', color: '#9ca3af', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <div>Email: <span style={{ color: '#58a6ff' }}>{depositToApprove.userEmail}</span></div>
+                  <div>Network: <span style={{ color: '#00f2fe' }}>{depositToApprove.network}</span></div>
+                  {depositToApprove.txHash && (
+                    <div style={{ wordBreak: 'break-all' }}>
+                      TxID / Hash: <span style={{ color: '#00f2fe', fontFamily: 'JetBrains Mono' }}>{depositToApprove.txHash}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Current Wallet Balances */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '10px',
+                marginBottom: '16px'
+              }}>
+                <div style={{ background: '#0e1422', border: '1px solid rgba(255, 255, 255, 0.05)', borderRadius: '10px', padding: '12px' }}>
+                  <div style={{ fontSize: '11px', color: '#9ca3af' }}>Current Initial Balance</div>
+                  <div style={{ fontSize: '16px', fontWeight: 700, color: '#ffd700', fontFamily: 'JetBrains Mono' }}>
+                    ${depositToApprove.initialBal.toFixed(2)} USD
+                  </div>
+                </div>
+                <div style={{ background: '#0e1422', border: '1px solid rgba(255, 255, 255, 0.05)', borderRadius: '10px', padding: '12px' }}>
+                  <div style={{ fontSize: '11px', color: '#9ca3af' }}>Current Active Balance (With Yield)</div>
+                  <div style={{ fontSize: '16px', fontWeight: 700, color: '#00e676', fontFamily: 'JetBrains Mono' }}>
+                    ${depositToApprove.currentBal.toFixed(2)} USD
+                  </div>
+                </div>
+              </div>
+
+              {/* Quick Calculation Selector */}
+              <div style={{ marginBottom: '14px' }}>
+                <label style={{ display: 'block', fontSize: '12px', color: '#ffffff', marginBottom: '8px', fontWeight: 600 }}>
+                  Select Crediting Option for +${depositToApprove.depositAmt.toFixed(2)} USD:
+                </label>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newBal = Math.round((depositToApprove.initialBal + depositToApprove.depositAmt) * 100) / 100;
+                      setDepositForm({ ...depositForm, newBalance: newBal, mode: 'INITIAL' });
+                    }}
+                    style={{
+                      background: depositForm.mode === 'INITIAL' ? 'rgba(0, 242, 254, 0.15)' : '#090d16',
+                      border: depositForm.mode === 'INITIAL' ? '1px solid #00f2fe' : '1px solid rgba(255, 255, 255, 0.08)',
+                      borderRadius: '10px',
+                      padding: '10px',
+                      textAlign: 'left',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <div style={{ fontSize: '11px', color: '#9ca3af' }}>Add to Initial Deposit</div>
+                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#00f2fe', fontFamily: 'JetBrains Mono' }}>
+                      ${(depositToApprove.initialBal + depositToApprove.depositAmt).toFixed(2)} USD
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newBal = Math.round((depositToApprove.currentBal + depositToApprove.depositAmt) * 100) / 100;
+                      setDepositForm({ ...depositForm, newBalance: newBal, mode: 'CURRENT' });
+                    }}
+                    style={{
+                      background: depositForm.mode === 'CURRENT' ? 'rgba(0, 230, 118, 0.15)' : '#090d16',
+                      border: depositForm.mode === 'CURRENT' ? '1px solid #00e676' : '1px solid rgba(255, 255, 255, 0.08)',
+                      borderRadius: '10px',
+                      padding: '10px',
+                      textAlign: 'left',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <div style={{ fontSize: '11px', color: '#9ca3af' }}>Add to Current Balance</div>
+                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#00e676', fontFamily: 'JetBrains Mono' }}>
+                      ${(depositToApprove.currentBal + depositToApprove.depositAmt).toFixed(2)} USD
+                    </div>
+                  </button>
+                </div>
+              </div>
+
+              {/* Editable New Balance Target Box */}
+              <div style={{
+                background: '#070a12',
+                border: '1px solid #00e676',
+                borderRadius: '12px',
+                padding: '14px',
+                marginBottom: '16px'
+              }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#00e676', marginBottom: '6px' }}>
+                  Target Wallet Balance to Credit (USD) *
+                </label>
+                <input
+                  type="number"
+                  step="any"
+                  value={depositForm.newBalance}
+                  onChange={e => setDepositForm({ ...depositForm, newBalance: e.target.value, mode: 'CUSTOM' })}
+                  className="input-field"
+                  style={{ fontSize: '18px', fontWeight: 800, fontFamily: 'JetBrains Mono', color: '#00e676' }}
+                  required
+                />
+                <p style={{ fontSize: '11px', color: '#9ca3af', marginTop: '6px' }}>
+                  This amount will immediately become the user's active wallet balance. Daily 3% compounding will smoothly proceed from this new amount.
+                </p>
+              </div>
+
+              {/* Optional Approval Note */}
+              <div style={{ marginBottom: '18px' }}>
+                <label style={{ display: 'block', fontSize: '12px', color: '#9ca3af', marginBottom: '4px' }}>
+                  Admin Note / Blockchain Reference (Optional)
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Confirmed on blockchain, credited $300"
+                  value={depositForm.note}
+                  onChange={e => setDepositForm({ ...depositForm, note: e.target.value })}
+                  className="input-field"
+                  style={{ fontSize: '12px' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  style={{ flex: 1 }}
+                  onClick={() => setDepositModalOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="btn btn-emerald" style={{ flex: 2, padding: '10px' }}>
+                  <CheckCircle size={16} /> Confirm Approval & Credit ${depositForm.newBalance || '0.00'}
                 </button>
               </div>
             </form>
