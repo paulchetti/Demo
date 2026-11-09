@@ -253,6 +253,57 @@ export function AdminDashboard() {
     }
   }
 
+  async function handleClearConversation(userId, userName, e) {
+    if (e) e.stopPropagation();
+    if (!window.confirm(`Are you sure you want to permanently clear the chat history for ${userName || 'this user'}?`)) {
+      return;
+    }
+    const token = localStorage.getItem('tt_token');
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/support/conversations/${userId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSupportConversations(prev => prev.filter(c => c.userId !== userId));
+        if (selectedConversationId === userId) {
+          setSelectedConversationId(null);
+        }
+        fetchSupportData();
+      } else {
+        alert(data.error || 'Failed to clear chat');
+      }
+    } catch (err) {
+      alert('Error clearing chat: ' + err.message);
+    }
+  }
+
+  async function handleDeleteMessage(messageId, e) {
+    if (e) e.stopPropagation();
+    if (!window.confirm('Delete this message from chat history?')) return;
+    const token = localStorage.getItem('tt_token');
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/support/messages/${messageId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSupportConversations(prev =>
+          prev.map(c => ({
+            ...c,
+            messages: c.messages.filter(m => m.id !== messageId)
+          }))
+        );
+      } else {
+        alert(data.error || 'Failed to delete message');
+      }
+    } catch (err) {
+      alert('Error deleting message: ' + err.message);
+    }
+  }
+
   async function handleCreateUser(e) {
     e.preventDefault();
     const token = localStorage.getItem('tt_token');
@@ -1735,21 +1786,42 @@ export function AdminDashboard() {
                             <span style={{ fontSize: '11px', color: '#64748b' }}>
                               {conv.userEmail || conv.userId}
                             </span>
-                            {hasUnread && (
-                              <span
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              {hasUnread && (
+                                <span
+                                  style={{
+                                    background: '#ff0055',
+                                    color: '#fff',
+                                    fontSize: '10px',
+                                    fontWeight: 700,
+                                    padding: '2px 8px',
+                                    borderRadius: '10px',
+                                    boxShadow: '0 2px 6px rgba(255, 0, 85, 0.4)'
+                                  }}
+                                >
+                                  {conv.unreadCount} New
+                                </span>
+                              )}
+                              <button
+                                onClick={(e) => handleClearConversation(conv.userId, conv.userName, e)}
                                 style={{
-                                  background: '#ff0055',
-                                  color: '#fff',
-                                  fontSize: '10px',
-                                  fontWeight: 700,
-                                  padding: '2px 8px',
-                                  borderRadius: '10px',
-                                  boxShadow: '0 2px 6px rgba(255, 0, 85, 0.4)'
+                                  background: 'transparent',
+                                  border: 'none',
+                                  color: '#64748b',
+                                  cursor: 'pointer',
+                                  padding: '2px 4px',
+                                  borderRadius: '4px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  transition: 'color 0.2s'
                                 }}
+                                title="Delete this conversation"
+                                onMouseEnter={e => e.currentTarget.style.color = '#ff7b72'}
+                                onMouseLeave={e => e.currentTarget.style.color = '#64748b'}
                               >
-                                {conv.unreadCount} New
-                              </span>
-                            )}
+                                <Trash2 size={13} />
+                              </button>
+                            </div>
                           </div>
                         </div>
                       );
@@ -1884,6 +1956,23 @@ export function AdminDashboard() {
                             </button>
                           </>
                         )}
+                        <button
+                          onClick={(e) => handleClearConversation(activeConv.userId, activeConv.userName, e)}
+                          className="btn btn-secondary"
+                          style={{
+                            fontSize: '11px',
+                            padding: '5px 10px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            color: '#ff7b72',
+                            borderColor: 'rgba(255, 123, 114, 0.35)',
+                            background: 'rgba(255, 123, 114, 0.08)'
+                          }}
+                          title="Permanently clear this chat thread"
+                        >
+                          <Trash2 size={12} /> Clear Chat
+                        </button>
                       </div>
                     </div>
 
@@ -1945,6 +2034,27 @@ export function AdminDashboard() {
                               <span style={{ color: '#64748b', fontWeight: 400, marginLeft: '4px' }}>
                                 {timeStr}
                               </span>
+                              <button
+                                onClick={(e) => handleDeleteMessage(msg.id, e)}
+                                style={{
+                                  background: 'transparent',
+                                  border: 'none',
+                                  color: '#64748b',
+                                  cursor: 'pointer',
+                                  padding: '0 4px',
+                                  borderRadius: '4px',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  marginLeft: '4px',
+                                  opacity: 0.6,
+                                  transition: 'all 0.2s'
+                                }}
+                                title="Delete this message"
+                                onMouseEnter={e => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.color = '#ff7b72'; }}
+                                onMouseLeave={e => { e.currentTarget.style.opacity = '0.6'; e.currentTarget.style.color = '#64748b'; }}
+                              >
+                                <Trash2 size={11} />
+                              </button>
                             </div>
 
                             <div

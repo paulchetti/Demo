@@ -3,6 +3,8 @@ import {
   getSupportMessagesByUserId,
   addSupportMessage,
   markSupportMessagesRead,
+  deleteSupportThreadByUserId,
+  deleteSupportMessageById,
   getAllUsers,
   getUserById
 } from '../database.js';
@@ -193,4 +195,41 @@ export function markAdminThreadRead(req, res) {
     res.status(500).json({ error: 'Failed to mark thread as read: ' + err.message });
   }
 }
+
+// DELETE /api/admin/support/conversations/:userId (Admin only)
+export function clearAdminConversation(req, res) {
+  try {
+    const { userId } = req.params;
+    if (!userId) {
+      return res.status(400).json({ error: 'userId is required' });
+    }
+
+    const deletedCount = deleteSupportThreadByUserId(userId);
+    res.json({ success: true, message: `Conversation cleared (${deletedCount} messages deleted)` });
+  } catch (err) {
+    console.error('Error clearing conversation:', err);
+    res.status(500).json({ error: 'Failed to clear conversation: ' + err.message });
+  }
+}
+
+// DELETE /api/admin/support/messages/:messageId (Admin only)
+export function deleteSingleMessage(req, res) {
+  try {
+    const { messageId } = req.params;
+    if (!messageId) {
+      return res.status(400).json({ error: 'messageId is required' });
+    }
+
+    const deleted = deleteSupportMessageById(messageId);
+    if (!deleted) {
+      return res.status(404).json({ error: 'Message not found' });
+    }
+
+    res.json({ success: true, message: 'Message removed successfully' });
+  } catch (err) {
+    console.error('Error deleting message:', err);
+    res.status(500).json({ error: 'Failed to delete message: ' + err.message });
+  }
+}
+
 

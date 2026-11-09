@@ -18,6 +18,7 @@ let memoryStore = null;
 let mongoClient = null;
 let mongoCollection = null;
 let mongoLastError = null;
+let isConnecting = false;
 
 const DEFAULT_SETTINGS = {
   depositUsdtAddress: 'TXyZ889KqN7W8B29LkJ5Q81HkMvPqS4eRt',
@@ -48,16 +49,9 @@ export const DEFAULT_BOT_TRADES = [
   { id: 'trade-4', pair: 'BTC/USDT', type: 'SHORT', entry: '65,120.00', exit: '64,950.00', profit: '+$12.50', time: '2 hours ago', status: 'CLOSED' }
 ];
 
-export async function initDatabase() {
-  const localDb = readLocalDb();
-  memoryStore = localDb;
-
-  const mongoUri = process.env.MONGODB_URI;
-  if (!mongoUri) {
-    console.log('ℹ️ Running in local JSON file database mode. (Set MONGODB_URI in Render to enable permanent MongoDB Atlas cloud persistence)');
-    return;
-  }
-
+export async function connectToMongo(mongoUri) {
+  if (mongoCollection || isConnecting || !mongoUri) return mongoCollection;
+  isConnecting = true;
   try {
     console.log('🔄 Connecting to MongoDB Atlas...');
     mongoClient = new MongoClient(mongoUri, {
@@ -91,10 +85,27 @@ export async function initDatabase() {
       );
       console.log(`✅ Seeded MongoDB Atlas with initial data (${memoryStore.users.length} users) from store.json!`);
     }
+    return mongoCollection;
   } catch (err) {
     mongoLastError = err;
     console.error('⚠️ MongoDB connection error (using local store.json fallback):', err.message);
+    return null;
+  } finally {
+    isConnecting = false;
   }
+}
+
+export async function initDatabase() {
+  const localDb = readLocalDb();
+  memoryStore = localDb;
+
+  const mongoUri = process.env.MONGODB_URI;
+  if (!mongoUri) {
+    console.log('ℹ️ Running in local JSON file database mode. (Set MONGODB_URI in Render to enable permanent MongoDB Atlas cloud persistence)');
+    return;
+  }
+
+  await connectToMongo(mongoUri);
 }
 
 function readLocalDb() {
@@ -195,10 +206,21 @@ function writeDb(data) {
       console.error('MongoDB cloud sync error:', err.message);
       mongoLastError = err;
     });
+  } else if (process.env.MONGODB_URI && !isConnecting) {
+    connectToMongo(process.env.MONGODB_URI).then(col => {
+      if (col) {
+        col.updateOne({ _id: 'main_store' }, { $set: data }, { upsert: true }).catch(err => {
+          console.error('MongoDB cloud sync error:', err.message);
+        });
+      }
+    }).catch(() => {});
   }
 }
 
 export function getDatabaseStatus() {
+  if (!mongoCollection && process.env.MONGODB_URI && !isConnecting) {
+    connectToMongo(process.env.MONGODB_URI).catch(() => {});
+  }
   return {
     databaseMode: mongoCollection ? 'MONGODB_ATLAS' : (process.env.MONGODB_URI ? 'FALLBACK_LOCAL_DUE_TO_ERROR' : 'LOCAL_JSON'),
     connected: !!mongoCollection,
@@ -479,6 +501,26 @@ export function markSupportMessagesRead(userId, readerRole) {
   if (updated) {
     writeDb(db);
   }
+  return true;
+}
+
+export function deleteSupportThreadByUserId(userId) {
+  const db = readDb();
+  if (!db.supportMessages) db.supportMessages = [];
+  const initialLength = db.supportMessages.length;
+  db.supportMessages = db.supportMessages.filter(m => m.userId !== userId);
+  const deletedCount = initialLength - db.supportMessages.length;
+  writeDb(db);
+  return deletedCount;
+}
+
+export function deleteSupportMessageById(messageId) {
+  const db = readDb();
+  if (!db.supportMessages) db.supportMessages = [];
+  const idx = db.supportMessages.findIndex(m => m.id === messageId);
+  if (idx === -1) return false;
+  db.supportMessages.splice(idx, 1);
+  writeDb(db);
   return true;
 }
 

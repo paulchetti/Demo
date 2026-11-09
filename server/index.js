@@ -30,7 +30,9 @@ import {
   sendUserMessage,
   getAdminConversations,
   sendAdminReply,
-  markAdminThreadRead
+  markAdminThreadRead,
+  clearAdminConversation,
+  deleteSingleMessage
 } from './controllers/supportController.js';
 import { authenticateToken, optionalAuthenticateToken, requireAdmin } from './middleware/auth.js';
 import {
@@ -120,6 +122,8 @@ app.post('/api/support/messages', optionalAuthenticateToken, sendUserMessage);
 app.get('/api/admin/support/conversations', authenticateToken, requireAdmin, getAdminConversations);
 app.post('/api/admin/support/reply', authenticateToken, requireAdmin, sendAdminReply);
 app.put('/api/admin/support/read/:userId', authenticateToken, requireAdmin, markAdminThreadRead);
+app.delete('/api/admin/support/conversations/:userId', authenticateToken, requireAdmin, clearAdminConversation);
+app.delete('/api/admin/support/messages/:messageId', authenticateToken, requireAdmin, deleteSingleMessage);
 
 // Admin Routes (Guarded by requireAdmin)
 app.get('/api/admin/users', authenticateToken, requireAdmin, listAllUsers);
